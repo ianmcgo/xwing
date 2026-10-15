@@ -97,3 +97,11 @@ Known gaps: the PDFs do not separate Restricted from Banned, so Restricted cards
 ## 11. XWA database tab
 
 The XWA Database tab now opens on embedded data (all 407 upgrades and 661 pilots with cost, slot, restrictions and Standard/Extended legality) with search, slot, faction and format filters, and works offline. Card text and art still come from xwing-data2 through the "Card text and art (online)" button.
+
+## 12. Expansions and campaign library
+
+1st Edition: `E1_SRC` holds the 63 products from xwing-data `sources.js` with the pilot and upgrade ids each contains (ids equal the row index in `E1_PILOTS` and `E1_UPGRADES`, checked by name). The Database tab has a My expansions panel for quantities; `S.exp1` stores them. The Owned only filter in the database, and an optional filter in the builder (`sq.ownOnly`), use expansions plus cards marked owned by hand.
+
+XWA: no product contents data is available (xwing-data2 has none and the points PDFs have none), so there is no expansion tracking for XWA yet.
+
+Campaign library: Defenders of the Empire, Flight Group Alpha (with card pack and Imperial AI cards), Omega One and Battlestar Pallas PDFs are in `files/campaigns/` and appear in the Rules tab for both editions.
