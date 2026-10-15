@@ -326,6 +326,63 @@ document.addEventListener("keydown",key);
 ov.appendChild(cardImg("upgrades",c.xws,c.fb,true,"max-width:min(95vw,520px);max-height:92vh;object-fit:contain;border-radius:12px;box-shadow:0 0 30px #000",c.name));
 document.body.appendChild(ov);
 }
+var KS=null;
+var KFAC={galacticempire:"Galactic Empire",rebelalliance:"Rebel Alliance",scumandvillainy:"Scum and Villainy",resistance:"Resistance",firstorder:"First Order",galacticrepublic:"Galactic Republic",separatistalliance:"Separatist Alliance"};
+function killShips(d){
+if(KS)return KS;
+var m={};
+d.pilots.forEach(function(x){var f=KFAC[x[0]]||x[0];(m[x[1]]=m[x[1]]||{})[f]=1});
+KS=Object.keys(d.ships).map(function(n){return{name:n,fac:Object.keys(m[n]||{}).join(", ")||"Other"}}).sort(function(a,b){return a.name.localeCompare(b.name)});
+return KS;
+}
+function killCounts(p){
+var c={};
+(p.killLog||[]).forEach(function(k){c[k.ship]=(c[k.ship]||0)+1});
+return c;
+}
+function ckKills(p){
+var go=function(d){
+var list=killShips(d);
+var old=document.getElementById("killov");if(old)old.remove();
+var q="",added=0,fac="All";
+var facs=["All"].concat(Object.keys(KFAC).map(function(k){return KFAC[k]}));
+var ov=h("div",{id:"killov",style:"position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.82);display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow:auto"});
+var done=function(){ov.remove();document.removeEventListener("keydown",key);refresh()};
+var key=function(e){if(e.key==="Escape")done()};
+document.addEventListener("keydown",key);
+ov.addEventListener("click",function(e){if(e.target===ov)done()});
+var box=h("div",{class:"card",style:"width:min(680px,100%);background:var(--panel)"});
+var draw=function(){
+box.innerHTML="";
+var rows=list.filter(function(x){return(fac==="All"||x.fac.indexOf(fac)>=0)&&(!q||x.name.toLowerCase().indexOf(q)>=0)});
+var counts=killCounts(p);
+box.appendChild(h("div",{class:"row",style:"align-items:center"},[h("h2",{class:"f"},"What did "+(p.name||"your pilot")+" shoot down?"),h("span",{class:"dim"},"Total kills "+(p.kills||0)),btn("Done",done,"p")]));
+box.appendChild(h("div",{class:"row",style:"margin:8px 0"},[
+h("div",{class:"f"},h("input",{type:"text",value:q,placeholder:"Search ship types",id:"killq",oninput:function(e){q=e.target.value.toLowerCase();var v=e.target.value;draw();var i=document.getElementById("killq");i.focus();i.setSelectionRange(v.length,v.length)}})),
+h("div",{},sel(facs,fac,function(v){fac=v;draw()}))
+]));
+box.appendChild(h("div",{class:"dim",style:"margin-bottom:6px"},"Tap a ship type to log a kill. "+(added?added+" added this time.":"")));
+box.appendChild(h("div",{style:"display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px;max-height:55vh;overflow:auto"},rows.map(function(x){
+return btn(x.name+(counts[x.name]?"  ×"+counts[x.name]:""),function(){p.killLog=p.killLog||[];p.killLog.push({ship:x.name,at:Date.now()});p.kills=(Number(p.kills)||0)+1;added++;log(p.name+" killed a "+x.name);save();draw()},counts[x.name]?"p":"");
+})));
+box.appendChild(h("div",{class:"row",style:"margin-top:8px"},[
+btn("Other ship type",function(){var v=prompt("Ship type");if(!v)return;p.killLog=p.killLog||[];p.killLog.push({ship:v,at:Date.now()});p.kills=(Number(p.kills)||0)+1;added++;log(p.name+" killed a "+v);save();draw()})
+]));
+};
+draw();
+ov.appendChild(box);
+document.body.appendChild(ov);
+};
+if(C2.data)return go(C2.data);
+fetch("data/cards2.json").then(function(r){return r.json()}).then(function(d){C2.data=d;go(d)}).catch(function(){alert("Ship list could not be loaded")});
+}
+function ckKillList(p){
+var c=killCounts(p),names=Object.keys(c).sort(function(a,b){return c[b]-c[a]||a.localeCompare(b)});
+if(!names.length)return null;
+return h("div",{class:"row",style:"margin-top:8px;gap:6px"},names.map(function(n){
+return h("span",{class:"tag",title:"Click to remove one",style:"cursor:pointer",onclick:function(){var i=-1;(p.killLog||[]).forEach(function(k,j){if(k.ship===n)i=j});if(i>=0){p.killLog.splice(i,1);p.kills=Math.max(0,(Number(p.kills)||0)-1);refresh()}}},n+" ×"+c[n]);
+}));
+}
 function dlFile(name,text,type){
 var blob=new Blob([text],{type:type||"application/json"});
 var u=URL.createObjectURL(blob);
@@ -405,6 +462,7 @@ th(["Ship","Rank","Initiative","XP","Kills"]),
 tr([p.ship,String(p.rank),String(p.ps),String(p.xp||0),String(p.kills||0)])
 ]),
 h("div",{style:"margin-bottom:10px"},"Ships owned: "+(ships||p.ship)),
+h("div",{style:"margin-bottom:10px"},"Kills by ship type: "+(Object.keys(killCounts(p)).map(function(n){return n+" x"+killCounts(p)[n]}).join(", ")||"none logged")),
 h("h2",{style:"font-size:16px;margin:10px 0 4px;color:#000"},"Loadout"),
 h("table",{style:"border-collapse:collapse;width:100%"},[th(["Slot","Card","XP","Text"])].concat(rows)),
 h("h2",{style:"font-size:16px;margin:14px 0 4px;color:#000"},"Deck (owned, not installed)"),
@@ -577,12 +635,14 @@ btn("New pilot",function(){CK.create={name:"",cls:null,exp:null,career:null};ren
 h("div",{class:"row",style:"margin-top:8px"},[
 h("div",{style:"width:220px"},field("Callsign",txt(p.name,function(v){p.name=v;refresh()}))),
 h("div",{style:"width:100px"},field("Kills",txt(p.kills||0,function(v){p.kills=v;refresh()},"number"))),
+btn("Add kill",function(){ckKills(p)},"p"),
 btn("Print pilot",function(){ckPrint(p)}),
 btn("Save pilot (JSON)",function(){ckSave(p)}),
 btn("Load pilot",ckLoad),
 btn("Export for Infinite Arenas",function(){ckExportXws(p)}),
 btn("Remove pilot",function(){if(confirm("Remove "+(p.name||"this pilot")+"?")){S.players.splice(S.ck,1);S.ck=0;refresh()}},"d")
-])
+]),
+ckKillList(p)
 ]);
 var loadout=h("div",{class:"card"},[
 h("h3",{},"Loadout · "+p.ship),

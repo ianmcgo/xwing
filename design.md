@@ -218,3 +218,7 @@ After picking a faction on the create screen, a faction with more than one rules
 Choosing Pirate Lords changes the cockpit like this: the pilot picks a career (Organizer, Professional, Gambler, Slicer, Gearhead, Demolitions, Cyborg or Miner); starts at 0 XP and initiative 1 (rank n gives initiative n, not n+1); gets a credits counter in the top row with an Add credits button (amounts in thousands); the campaign module switches to Pirate Lords so the Missions tab shows its missions; and the print sheet shows the career and credits. The career ships (TYE-Wing, TNT, Escape Craft) are custom cards missing from the card data, so the pilot flies the closest real ship. Store prices stay in XP, because the PLotAC upgrade prices were not found.
 
 The note about default store prices at the bottom of the cockpit was removed.
+
+## 31. Kills by ship type
+
+The Add kill button next to the Kills field opens a list of every 2nd edition ship type from the card data, with a search box and a faction filter. Each tap logs one kill of that type, adds one to the Kills total and stays open so several kills can be logged in a row; Other ship type takes a typed name. The pilot keeps the log in `killLog` (ship name and time). Under the pilot's name a row of tags shows the count per ship type; clicking a tag removes one of that type and lowers the total. The Kills number can still be typed by hand, which changes the total but not the log. The print sheet lists kills by ship type. Kills logged before this change show in the total only.
