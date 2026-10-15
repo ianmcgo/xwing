@@ -264,3 +264,7 @@ The Squad Builder tab is gone from Tools. The builder functions are still in the
 ## 38. Rules / Play removed, scenarios moved
 
 The Rules / Play tab is gone. The Standard scenarios card now sits on the Campaign page, and the HotAC rules summary shows under it for the HotAC editions. The Sources card was removed from the Campaign page. A saved tab of "rules" falls back to the Cockpit.
+
+## 39. Print sheet layout
+
+The printed pilot sheet centers all text, and its tables shrink to fit their content and sit in the middle of the page.

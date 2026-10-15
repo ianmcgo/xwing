@@ -457,7 +457,7 @@ function ckPrint(p){
 var old=document.getElementById("psheet");if(old)old.remove();
 var slots=ckSlots(p),load=(p.load&&p.load[p.ship])||{};
 var cls=HC_CLASSES.filter(function(c){return c.id===p.cls})[0];
-var cell="border:1px solid #888;padding:4px 6px;vertical-align:top;text-align:left";
+var cell="border:1px solid #888;padding:4px 6px;vertical-align:top;text-align:center";
 var tr=function(a){return h("tr",{},a.map(function(x,i){return h("td",{style:cell+(i===0?";white-space:nowrap":"")},x)}))};
 var th=function(a){return h("tr",{},a.map(function(x){return h("th",{style:cell+";background:#ddd;color:#000"},x)}))};
 var equipped={};
@@ -469,25 +469,25 @@ return tr([ckSlotLabel(sl),c?c.name:"empty",c?String(ckPrice(c)):"",c?c.text:""]
 var deck=Object.keys(p.deck||{}).filter(function(n){return hcMap()[n]&&!equipped[n]}).sort().map(function(n){var c=hcMap()[n];return tr([c.slots[0],c.name,String(ckPrice(c)),c.text])});
 var ships=Object.keys(p.owned||{}).map(function(n){return n+(n===p.ship?" (flying)":"")}).join(", ");
 var logRows=[];for(var i=0;i<12;i++)logRows.push(h("tr",{style:"height:30px"},[0,1,2,3,4].map(function(){return h("td",{style:cell})})));
-var sheet=h("div",{id:"psheet",style:"position:fixed;inset:0;z-index:2000;overflow:auto;background:#fff;color:#000;padding:16px;font-size:13px;line-height:1.35"},[
-h("div",{class:"noprint",style:"display:flex;gap:8px;margin-bottom:12px"},[
+var sheet=h("div",{id:"psheet",style:"position:fixed;inset:0;z-index:2000;overflow:auto;background:#fff;color:#000;padding:16px;font-size:13px;line-height:1.35;text-align:center"},[
+h("div",{class:"noprint",style:"display:flex;gap:8px;margin-bottom:12px;justify-content:center"},[
 btn("Print",function(){window.print()},"p"),
 btn("Close",function(){sheet.remove();document.body.classList.remove("psheet-open")})
 ]),
 h("h1",{style:"margin:0;font-size:24px;color:#000;letter-spacing:0"},(p.name||"Pilot")+" · "+(cls?cls.name:p.cls)),
 h("div",{style:"margin:4px 0 10px"},(HC_EXPS[p.exp||"hotac"].label)+" pilot sheet · "+new Date().toLocaleDateString()+(p.exp==="plotac"?" · Career: "+(p.career||"none")+" · Credits: $"+(p.credits||0)+"k":"")),
-h("table",{style:"border-collapse:collapse;width:100%;margin-bottom:10px"},[
+h("table",{style:"border-collapse:collapse;width:auto;max-width:100%;margin:0 auto 10px"},[
 th(["Ship","Rank","Initiative","XP","Kills"]),
 tr([p.ship,String(p.rank),String(p.ps),String(p.xp||0),String(p.kills||0)])
 ]),
 h("div",{style:"margin-bottom:10px"},"Ships owned: "+(ships||p.ship)),
 h("div",{style:"margin-bottom:10px"},"Kills by ship type: "+(Object.keys(killCounts(p)).map(function(n){return n+" x"+killCounts(p)[n]}).join(", ")||"none logged")),
 h("h2",{style:"font-size:16px;margin:10px 0 4px;color:#000"},"Loadout"),
-h("table",{style:"border-collapse:collapse;width:100%"},[th(["Slot","Card","XP","Text"])].concat(rows)),
+h("table",{style:"border-collapse:collapse;width:auto;max-width:100%;margin:0 auto"},[th(["Slot","Card","XP","Text"])].concat(rows)),
 h("h2",{style:"font-size:16px;margin:14px 0 4px;color:#000"},"Deck (owned, not installed)"),
-deck.length?h("table",{style:"border-collapse:collapse;width:100%"},[th(["Slot","Card","XP","Text"])].concat(deck)):h("div",{},"None"),
+deck.length?h("table",{style:"border-collapse:collapse;width:auto;max-width:100%;margin:0 auto"},[th(["Slot","Card","XP","Text"])].concat(deck)):h("div",{},"None"),
 h("h2",{style:"font-size:16px;margin:14px 0 4px;color:#000"},"Mission log"),
-h("table",{style:"border-collapse:collapse;width:100%"},[th(["Mission","Result","Kills","XP gained","Notes"])].concat(logRows))
+h("table",{style:"border-collapse:collapse;width:auto;max-width:100%;margin:0 auto"},[th(["Mission","Result","Kills","XP gained","Notes"])].concat(logRows))
 ]);
 document.body.appendChild(sheet);
 document.body.classList.add("psheet-open");
