@@ -284,3 +284,11 @@ All print output is set to US Letter, 8.5 by 11 inches, with half inch margins, 
 ## 43. AI cards tab
 
 AI Ships has two views: Random AI ship (the old roller) and AI cards. AI cards lists every loadout of the 28-row HotAC AI table as a card per ship, with a ship filter. Each card shows the Basic and Elite upgrades with initiative, and the named pilots. Upgrades found in the HotAC card data are tappable and show the full card with its XP price. These cards come from the AI table, not from the FGA Imperial AI card PDF, which stays in Rules and Books.
+
+## 44. Ship card popup in the cockpit
+
+The Cockpit has a Ship card button on the Loadout heading and on each ship in the Ships list. It opens a popup with the ship's attack arcs (drawn as an SVG over the base), stats, actions with linked actions, and the maneuver dial. The ship data is read at run time from xwing-data2, using the same manifest the Database tab loads, and matched to the ship by its xws name. The popup closes on Escape or a click outside it.
+
+The stats show the pilot's initiative from the cockpit. Equipped upgrades change them: Hull Upgrade adds 1 hull, Shield Upgrade adds 1 shield, Stealth Device adds 1 agility, and Engine Upgrade adds the Boost action. Any card whose text says the action bar gains an action also adds that action, outlined in green. Other upgrades change nothing here because their effects are only stored as text.
+
+The dial draws turns, banks, straight, K-turn and stationary. Other maneuvers (Segnor's and Tallon loops, reverse) show their data code until their letters are confirmed. The site http://x-wing-ai.com could not be reached from the build environment, so none of its content was used.
