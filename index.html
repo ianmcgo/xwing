@@ -51,7 +51,7 @@ td.hl{background:rgba(255,184,77,.18);font-weight:600}
 .log div{padding:3px 0;border-bottom:1px dashed var(--line)}
 .roll{font-size:40px;font-weight:800;color:var(--acc);font-variant-numeric:tabular-nums}
 .ok{color:var(--good)}.bad{color:var(--bad)}
-@media print{#stars{display:none}header,nav,button{display:none!important}body{background:#fff;color:#000}.card{border-color:#999;background:#fff}}
+@media print{body.psheet-open>*:not(#psheet){display:none!important}body.psheet-open #psheet{position:static!important;overflow:visible!important;padding:0!important}#psheet .noprint{display:none!important}#stars{display:none}header,nav,button{display:none!important}body{background:#fff;color:#000}.card{border-color:#999;background:#fff}}
 </style>
 <link rel="stylesheet" href="visitors/visitors.css?v=4">
 <style>:root{--sc:#f4c430}@media (max-width:700px){header .vc-panel{display:none!important}}header .vc-panel{min-width:0;padding:4px 12px 4px 14px}header .vc-panel .vc-foot{display:none}header .vc-panel .vc-num{font-size:18px;line-height:1.1}header .vc-panel .vc-head{margin-bottom:0;font-size:8px}header .vc-panel{display:block;position:relative;right:auto;bottom:auto;flex:none}header .hlinks{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:13px}header .hlinks a{color:var(--acc);text-decoration:none}header .hlinks a:hover{text-decoration:underline}header .hlinks .pat{border:1px solid var(--acc);border-radius:999px;padding:3px 12px}</style>
@@ -321,6 +321,95 @@ document.addEventListener("keydown",key);
 ov.appendChild(cardImg("upgrades",c.xws,c.fb,true,"max-width:min(95vw,520px);max-height:92vh;object-fit:contain;border-radius:12px;box-shadow:0 0 30px #000",c.name));
 document.body.appendChild(ov);
 }
+function dlFile(name,text,type){
+var blob=new Blob([text],{type:type||"application/json"});
+var u=URL.createObjectURL(blob);
+var a=h("a",{href:u,download:name});
+document.body.appendChild(a);a.click();a.remove();
+setTimeout(function(){URL.revokeObjectURL(u)},2000);
+}
+function fileSlug(p){return(p.name||"pilot").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"pilot"}
+function ckSave(p){
+dlFile(fileSlug(p)+"-hotac-pilot.json",JSON.stringify({format:"hotac-cockpit-pilot",version:1,pilot:p},null,2));
+}
+function ckLoad(){
+var inp=h("input",{type:"file",accept:".json,application/json",onchange:function(){
+var f=inp.files[0];if(!f)return;
+var r=new FileReader();
+r.onload=function(){
+try{
+var d=JSON.parse(r.result),q=d&&d.pilot;
+if(!q||!q.ship||!HC_SHIPS[q.ship])throw new Error("bad");
+q.owned=q.owned||{};q.deck=q.deck||{};q.load=q.load||{};q.xpInit=true;
+S.players.push(q);S.ck=S.players.length-1;log("Pilot loaded: "+(q.name||"pilot"));refresh();
+}catch(e){alert("That file is not a pilot saved from this app")}
+};
+r.readAsText(f);
+}});
+inp.click();
+}
+var XFACTION={Rebel:"rebelalliance",Jedi:"galacticrepublic",Scum:"scumandvillainy",Resistance:"resistance","First Order":"firstorder",Republic:"galacticrepublic",Separatist:"separatistalliance"};
+function xwsSlot(t){return t.toLowerCase().replace(/ /g,"-")}
+function ckXws(p,data){
+var ship=HC_SHIPS[p.ship],slots=ckSlots(p),load=(p.load&&p.load[p.ship])||{};
+var gen=data.pilots.filter(function(x){return x[x.length-1]===ship.xws&&x[10]===0});
+if(!gen.length)gen=data.pilots.filter(function(x){return x[x.length-1]===ship.xws});
+gen.sort(function(a,b){return Math.abs(a[4]-p.ps)-Math.abs(b[4]-p.ps)||a[6]-b[6]});
+var base=gen[0],ups={},extra=[];
+slots.forEach(function(sl){
+var n=load[sl.key];if(!n)return;
+var c=hcMap()[n];if(!c)return;
+if(!c.xws){extra.push(n+" (pilot ability)");return}
+var t=sl.choice?c.slots[0]:sl.types[0];
+var k=xwsSlot(t);
+(ups[k]=ups[k]||[]).push(c.xws);
+});
+var pts=(base?base[6]:0);
+return {name:p.name||"Pilot",description:"HotAC pilot: "+((HC_CLASSES.filter(function(c){return c.id===p.cls})[0]||{}).name||p.cls)+", rank "+p.rank+", initiative "+p.ps+", "+(p.xp||0)+" XP, "+(p.kills||0)+" kills."+(extra.length?" Also equipped: "+extra.join(", ")+".":""),faction:XFACTION[ship.cls]||"rebelalliance",pilots:[{id:base?base[11]:"",ship:ship.xws,upgrades:ups}],points:pts,version:"2.0.0",vendor:{"hotac-cockpit":{rank:p.rank,xp:p.xp||0,kills:p.kills||0}}};
+}
+function ckExportXws(p){
+var go=function(d){dlFile(fileSlug(p)+"-xws.json",JSON.stringify(ckXws(p,d),null,2))};
+if(C2.data)return go(C2.data);
+fetch("data/cards2.json").then(function(r){return r.json()}).then(function(d){C2.data=d;go(d)}).catch(function(){alert("Card data could not be loaded")});
+}
+function ckPrint(p){
+var old=document.getElementById("psheet");if(old)old.remove();
+var slots=ckSlots(p),load=(p.load&&p.load[p.ship])||{};
+var cls=HC_CLASSES.filter(function(c){return c.id===p.cls})[0];
+var cell="border:1px solid #888;padding:4px 6px;vertical-align:top;text-align:left";
+var tr=function(a){return h("tr",{},a.map(function(x,i){return h("td",{style:cell+(i===0?";white-space:nowrap":"")},x)}))};
+var th=function(a){return h("tr",{},a.map(function(x){return h("th",{style:cell+";background:#ddd;color:#000"},x)}))};
+var equipped={};
+var rows=slots.map(function(sl){
+var n=load[sl.key],c=n?hcMap()[n]:null;
+if(n)equipped[n]=1;
+return tr([ckSlotLabel(sl),c?c.name:"empty",c?String(ckPrice(c)):"",c?c.text:""]);
+});
+var deck=Object.keys(p.deck||{}).filter(function(n){return hcMap()[n]&&!equipped[n]}).sort().map(function(n){var c=hcMap()[n];return tr([c.slots[0],c.name,String(ckPrice(c)),c.text])});
+var ships=Object.keys(p.owned||{}).map(function(n){return n+(n===p.ship?" (flying)":"")}).join(", ");
+var logRows=[];for(var i=0;i<12;i++)logRows.push(h("tr",{style:"height:30px"},[0,1,2,3,4].map(function(){return h("td",{style:cell})})));
+var sheet=h("div",{id:"psheet",style:"position:fixed;inset:0;z-index:2000;overflow:auto;background:#fff;color:#000;padding:16px;font-size:13px;line-height:1.35"},[
+h("div",{class:"noprint",style:"display:flex;gap:8px;margin-bottom:12px"},[
+btn("Print",function(){window.print()},"p"),
+btn("Close",function(){sheet.remove();document.body.classList.remove("psheet-open")})
+]),
+h("h1",{style:"margin:0;font-size:24px;color:#000;letter-spacing:0"},(p.name||"Pilot")+" · "+(cls?cls.name:p.cls)),
+h("div",{style:"margin:4px 0 10px"},"Heroes of the Aturi Cluster pilot sheet · "+new Date().toLocaleDateString()),
+h("table",{style:"border-collapse:collapse;width:100%;margin-bottom:10px"},[
+th(["Ship","Rank","Initiative","XP","Kills"]),
+tr([p.ship,String(p.rank),String(p.ps),String(p.xp||0),String(p.kills||0)])
+]),
+h("div",{style:"margin-bottom:10px"},"Ships owned: "+(ships||p.ship)),
+h("h2",{style:"font-size:16px;margin:10px 0 4px;color:#000"},"Loadout"),
+h("table",{style:"border-collapse:collapse;width:100%"},[th(["Slot","Card","XP","Text"])].concat(rows)),
+h("h2",{style:"font-size:16px;margin:14px 0 4px;color:#000"},"Deck (owned, not installed)"),
+deck.length?h("table",{style:"border-collapse:collapse;width:100%"},[th(["Slot","Card","XP","Text"])].concat(deck)):h("div",{},"None"),
+h("h2",{style:"font-size:16px;margin:14px 0 4px;color:#000"},"Mission log"),
+h("table",{style:"border-collapse:collapse;width:100%"},[th(["Mission","Result","Kills","XP gained","Notes"])].concat(logRows))
+]);
+document.body.appendChild(sheet);
+document.body.classList.add("psheet-open");
+}
 function ckCardView(c,actions){
 var th=c.xws?cardImg("upgrades",c.xws,c.fb,false,"width:72px;height:72px;object-fit:cover;border-radius:6px;cursor:zoom-in",""):null;
 if(th)th.addEventListener("click",function(){cardZoom(c)});
@@ -465,6 +554,10 @@ btn("New pilot",function(){CK.create={name:"",cls:null};render()},"p")
 h("div",{class:"row",style:"margin-top:8px"},[
 h("div",{style:"width:220px"},field("Callsign",txt(p.name,function(v){p.name=v;refresh()}))),
 h("div",{style:"width:100px"},field("Kills",txt(p.kills||0,function(v){p.kills=v;refresh()},"number"))),
+btn("Print pilot",function(){ckPrint(p)}),
+btn("Save pilot (JSON)",function(){ckSave(p)}),
+btn("Load pilot",ckLoad),
+btn("Export for Infinite Arenas",function(){ckExportXws(p)}),
 btn("Remove pilot",function(){if(confirm("Remove "+(p.name||"this pilot")+"?")){S.players.splice(S.ck,1);S.ck=0;refresh()}},"d")
 ])
 ]);

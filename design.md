@@ -189,3 +189,12 @@ Slot bars for the new ships are built from the real 2nd edition ship data (the s
 On the create screen, once a faction is chosen the other faction cards are hidden, and a Back to factions button near the bottom clears the choice and shows them all again.
 
 The Separatists class (Vulture Droid, Droid Tri-Fighter, Hyena Droid Bomber, Belbullab-22, Nantex-class) was added the same way, from another pasted community summary that could not be verified. Its slot bars come from the ship data; the Nantex has none beyond the rank slot. The catalog has no Tactical Relay cards yet, so that slot stays empty. The credits economy, the droid wingman and the Republic enemy AI are not built.
+
+## 27. Print, save and export a pilot
+
+Four buttons sit under the pilot name in the cockpit.
+
+- **Print pilot:** opens a white pilot sheet with callsign, class, ship, rank, initiative, XP, kills, ships owned, the full loadout with card text and XP prices, the owned but uninstalled deck, and twelve blank mission log rows. Its Print button uses the browser print dialog (choose Save as PDF there for a file). When printing, everything else on the page is hidden.
+- **Save pilot (JSON):** downloads `<callsign>-hotac-pilot.json` holding the whole pilot, with the format name `hotac-cockpit-pilot`.
+- **Load pilot:** reads such a file and adds it as a new pilot.
+- **Export for Infinite Arenas:** downloads `<callsign>-xws.json` in the XWS 2.0 squad format, which Infinite Arenas and other squad builders import. It holds one ship: the generic pilot of that ship nearest the pilot's initiative, plus the installed upgrades that exist as real cards. HotAC pilot abilities (Aces) are not real upgrade cards, so they are listed in the description instead. The points are the generic pilot's base cost, since HotAC XP is not squad points. The import into Infinite Arenas itself was not tested because the site could not be reached from here.
