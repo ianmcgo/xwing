@@ -72,7 +72,7 @@ var EDITIONS={
 "xwa":{label:"XWA Edition",ps:"Initiative",src:"v2"}
 };
 var MODULES={
-"hotac":{label:"Heroes of the Aturi Cluster",newShip:null},
+"hotac":{label:"Heroes of the Aturi Cluster 2.07",newShip:null},
 "pallas":{label:"Battlestar Pallas",newShip:5},
 "dote":{label:"Defenders of the Empire",newShip:null},
 "fga":{label:"Flight Group Alpha",newShip:null},
@@ -150,6 +150,7 @@ refresh()},"d")
 ]),
 field("Upgrades",tagList(p.upgrades,function(k){p.upgrades.splice(k,1);refresh()},function(v){p.upgrades.push(v);refresh()},"upgrade, Enter")),
 field("Elite talents / titles",tagList(p.talents,function(k){p.talents.splice(k,1);refresh()},function(v){p.talents.push(v);refresh()},"talent, Enter")),
+S.module==="hotac"?shopBlock(p):null,
 field("Notes",h("textarea",{rows:2,onchange:function(e){p.notes=e.target.value;save()}},p.notes||""))
 ]);
 }
@@ -174,7 +175,7 @@ h("div",{class:"row",style:"margin-top:10px"},[
 btn("Mission complete (next mission)",function(){log("Mission "+S.mission+" complete (season "+S.season+")");S.mission++;refresh()},"p"),
 btn("Next season",function(){S.season++;S.mission=1;log("Season "+S.season+" begins");refresh()})
 ]),
-S.edition==="xwa"?h("div",{class:"note"},"XWA edition rules are not yet defined; it currently uses 2nd edition data and a placeholder ruleset."):null,
+S.edition==="xwa"?h("div",{class:"note"},"XWA uses the 2023 rulebook, rules reference and errata. Use the Rules / Play tab for the game tracker."):null,
 S.edition==="2.5e"?h("div",{class:"note"},"2.5 uses current xwing-data2 points and errata."):null
 ]);
 var b=h("div",{class:"card"},[
@@ -183,6 +184,7 @@ h("div",{class:"big"},S.players.length+" pilot"+(S.players.length===1?"":"s")),
 h("div",{class:"dim"},"Total XP held: "+S.players.reduce(function(s,p){return s+p.xp},0)+"  ·  Pool: "+S.pool),
 h("div",{class:"row",style:"margin-top:10px"},[
 btn("Add pilot",function(){if(S.players.length>=4&&!confirm("More than 4 pilots. Add anyway?"))return;S.players.push(newPlayer());log("Pilot added");S.tab="pilots";refresh()},"p"),
+S.module==="hotac"?btn("Add pilot: X-wing or Y-wing",function(){var n=prompt("Starting ship: X-wing or Y-wing");if(!n)return;var f=HOTAC_START.filter(function(x){return x[0].toLowerCase()===n.toLowerCase()})[0];if(!f){alert("Choose X-wing or Y-wing");return}var pl=newPlayer();pl.ship=f[0];pl.xp=f[1];pl.ps=2;S.players.push(pl);log("Pilot added in "+f[0]+" with "+f[1]+" XP");refresh()}):null,
 S.module==="pallas"?btn("Add pilot with starting XP…",function(){
 var n=prompt("Ship ("+PALLAS_START.map(function(x){return x[0]}).join(", ")+")");
 if(!n)return;
@@ -405,7 +407,219 @@ h("div",{class:"dim"},"2E / 2.5E / XWA card data: xwing-data2 (MIT). 1E card ima
 return h("div",{class:"grid g2"},[a,b,c]);
 }
 
-var TABS=[["campaign","Campaign",viewCampaign],["pilots","Pilots",viewPilots],["hangar","Hangar",viewHangar],["ai","AI Ships",viewAI],["browser","Cards",viewBrowser],["settings","Settings",viewSettings]];
+
+var HOTAC_START=[["X-wing",10],["Y-wing",16]];
+var HOTAC_IN3=["A-wing","B-wing","HWK-290"];
+var HOTAC_MISSIONS=[
+["Introduction","Local Trouble","Friendly",10],
+["Capture the Officer","Capture the Officer","Friendly",12],["Capture the Officer","Nobody Home","Friendly",10],["Capture the Officer","Miners Strike","Friendly",12],
+["The Refueling Station","Rescue Rebel Operatives","Neutral",10],["The Refueling Station","Disable Sensor Net","Neutral",12],["The Refueling Station","Capture Refueling Station","Hostile",12],
+["Minefields","Tread Softly","Friendly",12],["Minefields","Imperial Entanglements","Neutral",10],["Minefields","Care Package","Hostile",10],
+["Chasing Phantoms","Needle in a Haystack","Neutral",12],["Chasing Phantoms","Bait","Neutral",10],["Chasing Phantoms","Cloak and Dagger","Hostile",12],["Chasing Phantoms","Revenge","Hostile",10],
+["Defection","Secure the Holonet","Neutral",12],["Defection","Defector","Hostile",10],["Defection","Pride of the Empire","Neutral",12]
+];
+var TERRITORY={Friendly:{dice:1,escape:"Hyperspace or any board edge",end:"Rebels automatically retreat"},Neutral:{dice:2,escape:"Hyperspace or designated edges",end:"Rebels automatically retreat"},Hostile:{dice:3,escape:"Hyperspace or designated edges",end:"Rebels still in play are destroyed"}};
+var SHOP_KINDS=[["upgrade","Upgrade / modification (squad point cost)"],["charge","Extra charge (original ordnance cost)"],["ship","Change ship (5 XP)"],["init","Increase initiative (new level × 3)"],["talent","Elite pilot talent (squad cost × 2)"],["ability","Rebel pilot ability (owner initiative × 2)"],["force","Force talent (owner initiative × (3 + charges))"]];
+var XWA_SCENARIOS=[
+["Assault at the Satellite Array","5 satellites. From round 2, at the start of the End Phase each player scores 1 for each satellite they control (more ships at range 0-1 than anyone else; medium and large ships count as two). Destroying a ship scores its squad point value for the opponent."],
+["Chance Engagement","1 satellite. From round 2, contest it (a ship at range 0-2) for 1 point, +1 more if you alone contest. A ship reduced to half health gives the opponent half its squad points rounded down. Destroying a ship gives half its points rounded up, or its full points if none were scored earlier from that ship."],
+["Salvage Mission","5 supply caches. Retrieve as many as possible before the enemy. See rulebook pages 20-21 for scoring."],
+["Scramble the Transmissions","Scramble the transmissions from the satellites to deny the enemy information. See rulebook pages 21-22 for scoring."]
+];
+var XWA_PHASES=["Planning","System","Activation","Engagement","End"];
+var XW={max:200,p1:{name:"Player 1",pts:0,mp:0},p2:{name:"Player 2",pts:0,mp:0},round:1,scen:0,started:false};
+try{if(S.xwa)XW=Object.assign(XW,S.xwa)}catch(e){}
+function xsave(){S.xwa=XW;refresh()}
+function shopCost(kind,p,base,extra){
+if(kind==="ship")return 5;
+if(kind==="init")return(Number(p.ps)+1)*3;
+if(kind==="talent"||kind==="ability")return base*2;
+if(kind==="force")return base*(3+extra);
+return base;
+}
+function shopBlock(p){
+p.shop=Object.assign({kind:"upgrade",name:"",base:0,extra:0},p.shop||{});
+var sh=p.shop;
+var cost=shopCost(sh.kind,p,Number(sh.base)||0,Number(sh.extra)||0);
+var needsBase=["upgrade","charge","talent","ability","force"].indexOf(sh.kind)>=0;
+var baseLabel={upgrade:"Squad point cost",charge:"Original ordnance cost",talent:"Squad point cost",ability:"Owner initiative",force:"Owner initiative"}[sh.kind];
+return h("div",{class:"note"},[
+h("b",{},"Spend XP"),
+field("Purchase",sel(SHOP_KINDS,sh.kind,function(v){sh.kind=v;refresh()})),
+sh.kind==="init"?null:field(sh.kind==="ship"?"New ship":"Card name",txt(sh.name,function(v){sh.name=v;save()})),
+needsBase?field(baseLabel,txt(sh.base,function(v){sh.base=v;refresh()},"number")):null,
+sh.kind==="force"?field("Force charges of the owner",txt(sh.extra,function(v){sh.extra=v;refresh()},"number")):null,
+h("div",{class:"row",style:"margin-top:8px"},[
+h("span",{class:"big",style:"font-size:20px"},cost+" XP"),
+btn("Buy",function(){
+if(p.xp<cost){alert("Not enough XP");return}
+if(sh.kind==="ship"&&HOTAC_IN3.indexOf(sh.name)>=0&&Number(p.ps)<3&&!confirm("Unlocked at initiative 3. Buy anyway?"))return;
+if(sh.kind==="ability"||sh.kind==="force"){if(Number(p.ps)<Number(sh.base)&&!confirm("Your initiative is below the owner's. Buy anyway?"))return}
+if((sh.kind==="talent"||sh.kind==="ability"||sh.kind==="force")&&Number(p.ps)<3&&!confirm("Talent slots open at initiative 3. Buy anyway?"))return;
+p.xp-=cost;
+var nm=sh.name||sh.kind;
+if(sh.kind==="init"){p.ps=Number(p.ps)+1;nm="Initiative "+p.ps}
+else if(sh.kind==="ship"){p.ship=sh.name||p.ship}
+else if(sh.kind==="talent"||sh.kind==="ability"||sh.kind==="force")p.talents.push(nm);
+else if(sh.kind==="charge")p.upgrades.push(nm+" (+1 charge)");
+else p.upgrades.push(nm);
+log((p.name||"Pilot")+" bought "+nm+" for "+cost+" XP");
+sh.name="";refresh();
+},"p")
+])
+]);
+}
+function ejectRoll(n){
+var faces=["d","d","d","c","c","f","f",""];
+var r=[];for(var i=0;i<n;i++)r.push(faces[rr(0,7)]);
+return r;
+}
+function ejectText(r){
+var c=r.filter(function(x){return x==="c"}).length,d=r.filter(function(x){return x==="d"}).length,f=r.filter(function(x){return x==="f"}).length;
+var out=[];
+if(c>=2)out.push("pilot killed, start a new pilot");
+else if(c===1)out.push("lose most expensive elite talent or pilot ability");
+if(d)out.push("lose most expensive upgrade"+(d>1?" ×"+d:""));
+if(f===1)out.push("half XP this mission, rounded down");
+if(f>=2)out.push("no XP this mission");
+if(!out.length)out.push("safely ejected");
+return{c:c,d:d,f:f,msg:out.join("; ")};
+}
+var TALLY_FIELDS=[["dmg","Damage dealt"],["kills","Kills"],["large","Large ship kills"],["nonf","Non-TIE-fighter kills"],["elite","Elite kills"],["assist","Assists"],["guardian","Guardian"],["bonus","Objective ± XP"]];
+function tallyFor(i){S.hotac=S.hotac||{done:{},cur:null,tally:{}};var t=S.hotac.tally[i];if(!t)t=S.hotac.tally[i]={dmg:0,kills:0,large:0,nonf:0,elite:0,assist:0,guardian:0,bonus:0,down:false};return t}
+function tallyXP(i){var t=tallyFor(i);return t.dmg+t.kills+t.large+t.nonf+t.assist+t.guardian+t.bonus}
+function viewMissions(){
+S.hotac=S.hotac||{done:{},cur:null,tally:{}};
+var H=S.hotac;
+if(S.module!=="hotac")return h("div",{class:"card"},"The mission list and XP tally are built for the Heroes of the Aturi Cluster module. Switch the campaign module on the Campaign tab.");
+var avg=S.players.length?(S.players.reduce(function(s,p){return s+Number(p.ps||0)},0)/S.players.length):0;
+var arcs={};HOTAC_MISSIONS.forEach(function(m,i){(arcs[m[0]]=arcs[m[0]]||[]).push([m,i])});
+var list=h("div",{class:"card"},[
+h("h2",{},"Missions"),
+h("div",{class:"dim"},"Difficulty follows the average initiative of the pilots flying: "+(avg?avg.toFixed(1):"no pilots")),
+h("div",{},Object.keys(arcs).map(function(a){return h("div",{style:"margin-top:10px"},[h("h3",{},a),h("table",{},arcs[a].map(function(x){
+var m=x[0],i=x[1],done=H.done[i];
+return h("tr",{class:H.cur===i?"hl":""},[h("td",{},m[1]),h("td",{},m[2]+" · "+m[3]+" turns"),h("td",{},done?h("span",{class:done==="win"?"ok":"bad"},done==="win"?"Won":"Lost"):""),h("td",{},btn("Fly",function(){H.cur=i;H.tally={};S.mission=i+1;log("Mission started: "+m[1]);refresh()}))]);
+}))])}))
+]);
+var cur=H.cur!=null?HOTAC_MISSIONS[H.cur]:null;
+var out=[list];
+if(cur){
+var terr=TERRITORY[cur[2]];
+var elites=S.players.reduce(function(s,p,i){return s+tallyFor(i).elite},0);
+var rows=S.players.map(function(p,i){
+var t=tallyFor(i);
+return h("tr",{},[h("td",{},p.name||("Pilot "+(i+1))),].concat(TALLY_FIELDS.filter(function(f){return f[0]!=="elite"}).map(function(f){return h("td",{},txt(t[f[0]],function(v){t[f[0]]=v;refresh()},"number"))})).concat([h("td",{},h("input",{type:"checkbox",checked:t.down,onchange:function(e){t.down=e.target.checked;save()}})),h("td",{class:"hl"},tallyXP(i)+elites)]));
+});
+out.push(h("div",{class:"card"},[
+h("h2",{},cur[1]),
+h("div",{class:"dim"},cur[2]+" territory · "+cur[3]+" turns · eject roll "+terr.dice+" attack di"+(terr.dice>1?"ce":"e")+" · escape: "+terr.escape+" · at turn limit: "+terr.end),
+h("div",{class:"row",style:"margin:8px 0"},[h("label",{style:"margin:0"},"Elite kills this mission (everyone +1 XP each)"),h("div",{style:"width:90px"},txt(S.players.length?tallyFor(0).elite:0,function(v){if(S.players.length){tallyFor(0).elite=v;refresh()}},"number"))]),
+S.players.length?h("div",{style:"overflow:auto"},h("table",{},[h("tr",{},["Pilot","Damage","Kills","Large","Non-F TIE","Assists","Guardian","± Obj","Shot down","XP"].map(function(x){return h("th",{},x)}))].concat(rows))):h("div",{class:"dim"},"Add pilots first."),
+h("div",{class:"row",style:"margin-top:10px"},[
+btn("Mission won: bank XP",function(){bank("win")},"p"),
+btn("Mission lost: bank XP",function(){bank("loss")})
+]),
+h("div",{class:"note"},"+1 XP per damage dealt, per kill, per large ship, per non-TIE-fighter kill, per assist and guardian bonus, plus objective bonuses or penalties. Shot-down pilots roll to eject when you bank.")
+]));
+}
+function bank(result){
+var terr=TERRITORY[HOTAC_MISSIONS[H.cur][2]];
+var elites=S.players.reduce(function(s,p,i){return s+tallyFor(i).elite},0);
+var allDown=S.players.length&&S.players.every(function(p,i){return tallyFor(i).down});
+if(!confirm("Bank XP and roll eject results for shot-down pilots?"))return;
+if(allDown){log("All pilots shot down: captured by the Empire. The campaign is lost.");alert("No survivors: all pilots were shot down. The campaign is lost per the rules.")}
+S.players.forEach(function(p,i){
+var t=tallyFor(i),gain=tallyXP(i)+elites,msg="";
+if(t.down){
+var res=ejectText(ejectRoll(terr.dice));
+msg=" eject: "+res.msg;
+if(res.f===1)gain=Math.floor(gain/2);
+if(res.f>=2)gain=0;
+if(res.c>=2){p.xp=0;p.kills=0;p.upgrades=[];p.talents=[];p.ps=2;p.ship="";msg+=" (pilot reset)"}
+}
+if(!(t.down&&p.ship===""))p.xp+=gain;
+log((p.name||"Pilot "+(i+1))+" +"+gain+" XP"+msg);
+});
+H.done[H.cur]=result;H.tally={};
+log("Mission "+HOTAC_MISSIONS[H.cur][1]+(result==="win"?" won":" lost"));
+refresh();
+}
+return h("div",{class:"grid g2"},out);
+}
+function viewXWA(){
+var m=XW;
+var d1=Math.max(0,m.max-Number(m.p1.pts)),d2=Math.max(0,m.max-Number(m.p2.pts));
+function side(P,defOpp){
+return h("div",{class:"card"},[
+h("div",{class:"row"},[h("h3",{class:"f"},P.name),h("div",{class:"big"},P.mp+" MP")]),
+field("Name",txt(P.name,function(v){P.name=v;xsave()})),
+field("Squad points",txt(P.pts,function(v){P.pts=v;xsave()},"number")),
+h("div",{class:"dim"},"Deficit "+(P===m.p1?d1:d2)+" gives the opponent "+(P===m.p1?d1:d2)+" starting mission points."),
+h("div",{class:"row",style:"margin-top:8px"},[btn("+1",function(){P.mp++;xsave()}),btn("+2",function(){P.mp+=2;xsave()}),btn("+5",function(){P.mp+=5;xsave()}),btn("−1",function(){P.mp--;xsave()})]),
+h("div",{class:"row",style:"margin-top:8px"},[
+h("div",{class:"f"},txt(0,function(v){P._add=v},"number")),
+btn("Ship destroyed: add points",function(){P.mp+=Number(P._add)||0;P._add=0;xsave()})
+])
+]);
+}
+var lead=m.p1.mp>m.p2.mp?m.p1:m.p2.mp>m.p1.mp?m.p2:null;
+var endNow=lead&&lead.mp>=20;
+var setup=h("div",{class:"card"},[
+h("h2",{},"XWA game tracker"),
+h("div",{class:"dim"},"Rulebook v1.1.1 (10/30/2023), Rules Reference v1.4.6, Errata v1.8.2."),
+field("Maximum squad points",txt(m.max,function(v){m.max=v;xsave()},"number")),
+btn("Start game: award deficit mission points",function(){m.p1.mp=d2;m.p2.mp=d1;m.round=1;m.started=true;log("XWA game started. "+m.p1.name+" "+m.p1.mp+" MP, "+m.p2.name+" "+m.p2.mp+" MP");xsave()},"p"),
+h("div",{class:"row",style:"margin-top:12px"},[h("div",{class:"big"},"Round "+m.round+" / 12"),btn("Next round",function(){if(m.round<12){m.round++;xsave()}else alert("Round 12 was the last round")}),btn("Back",function(){if(m.round>1){m.round--;xsave()}}),btn("Reset game",function(){m.p1.mp=0;m.p2.mp=0;m.round=1;m.started=false;xsave()},"d")]),
+h("div",{class:"row",style:"margin-top:10px"},XWA_PHASES.map(function(ph,i){return h("span",{class:"tag"},(i+1)+". "+ph)})),
+endNow?h("div",{class:"note ok"},lead.name+" has 20 or more mission points and leads: the game ends at the end of this End Phase."):null,
+m.round===12?h("div",{class:"note"},"Final round: the game ends after the End Phase. Most mission points wins if both players still have ships in play."):null
+]);
+var scen=h("div",{class:"card"},[
+h("h2",{},"Standard scenarios"),
+sel(XWA_SCENARIOS.map(function(x,i){return[String(i),x[0]]}),String(m.scen),function(v){m.scen=Number(v);xsave()}),
+h("div",{class:"note"},XWA_SCENARIOS[m.scen][1]),
+btn("Random scenario",function(){m.scen=rr(0,3);xsave()}),
+h("div",{class:"dim",style:"margin-top:8px"},"Play area 3'×3'. Six obstacles (asteroid, debris field, gas cloud). Ends when only one player has ships left, at 20+ mission points with a lead, or after round 12.")
+]);
+var rules=h("div",{class:"card"},[
+h("h2",{},"Key rules"),
+h("div",{},[
+"Twelve rounds, five phases each: Planning, System, Activation, Engagement, End.",
+"Ships act in initiative order; players choose ascending or descending order.",
+"Squad points limit the list; loadout points limit upgrades on each ship (its loadout value).",
+"Standard loadout ships carry only the upgrades printed on their card.",
+"Limited cards: bullets before the name cap the copies in a squadron.",
+"Mission points, not just kills, decide the winner; a deficit gives the opponent starting points.",
+"Where a card contradicts the Rules Reference, the card wins; where the Reference contradicts the Rulebook, the Reference wins."
+].map(function(x){return h("div",{style:"padding:3px 0;border-bottom:1px dashed var(--line)"},x)}))
+]);
+return h("div",{class:"grid g2"},[setup,side(m.p1),side(m.p2),scen,rules]);
+}
+function viewRules(){
+if(S.edition==="xwa")return viewXWA();
+return viewHotacRules();
+}
+function viewHotacRules(){
+var items=[
+["Starting ships","X-wing starts with 10 XP, Y-wing with 16 XP. Initial XP can only buy upgrades and modifications."],
+["Ship unlocks","A-wing, B-wing and HWK-290 unlock at initiative 3. Changing ship costs 5 XP."],
+["Upgrades","XP cost equals squad point cost. Extra charges cost the original ordnance cost, one per initiative level, at most double the original."],
+["Initiative","One level at a time, cost is the new level × 3."],
+["Elite talents","Slots open at initiative 3; cost is squad cost × 2. Squad Leader cannot be bought."],
+["Pilot abilities","Cost is the owner's initiative × 2; your initiative must be at least theirs."],
+["Force talents","From initiative 3. Cost is owner initiative × (3 + their force charges). Maximum 3 force charges."],
+["Eject","Friendly 1 die, Neutral 2, Hostile 3. Two crits: pilot killed. One crit: lose best talent. Hit: lose best upgrade. One focus: half XP. Two focus: no XP."],
+["Earning XP","+1 per damage, +1 per kill, +1 large ship, +1 non-TIE-fighter, +1 elite kill for everyone, +1 assist, +1 guardian, plus objective bonuses."],
+["Difficulty","Set by the average initiative of the pilots flying."]
+];
+return h("div",{class:"grid g2"},[
+h("div",{class:"card"},[h("h2",{},"HotAC 2.07.04 rules summary"),h("div",{class:"dim"},"Conversion by Shaun Tiernan of the original by Josh Derksen."),h("table",{},items.map(function(x){return h("tr",{},[h("td",{style:"white-space:nowrap;color:var(--acc)"},x[0]),h("td",{},x[1])])}))]),
+h("div",{class:"card"},[h("h2",{},"Edition note"),h("div",{class:"note"},S.edition==="1e"?"The original first edition campaign book is in the 1stEdition download; its rules are not yet encoded here.":"These numbers come from the 2.07.04 conversion for second edition rules.")])
+]);
+}
+
+var TABS=[["campaign","Campaign",viewCampaign],["pilots","Pilots",viewPilots],["hangar","Hangar",viewHangar],["ai","AI Ships",viewAI],["missions","Missions",viewMissions],["rules","Rules / Play",viewRules],["browser","Cards",viewBrowser],["settings","Settings",viewSettings]];
 function render(){
 var sub=document.getElementById("subtitle");
 sub.textContent=MODULES[S.module].label+" · Season "+S.season+" · Mission "+S.mission;

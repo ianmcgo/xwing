@@ -31,7 +31,7 @@ Each edition is a pack, selected per campaign and fixed for the life of that cam
 | 1E | Original HotAC by Josh Derksen | Derived from VASSAL module JSON and xwing-data (v1) shape; card art from voidstate | x-wing-ai.com 1E AI cards |
 | 2E | HotAC 2nd Edition by Hinny | xwing-data2, pre-2.5 points | HotAC 2E automation cards |
 | 2.5E | HotAC 2E with 2.5 point/ruleset updates | xwing-data2 current (v3.9.1) | x-wing-ai.com 2E/2.5 AI cards |
-| XWA | X-Wing Alliance flavored variant | To be defined (see open questions) | To be defined |
+| XWA | Newest ruleset: Rulebook v1.1.1 (10/30/2023), Rules Reference v1.4.6, Errata v1.8.2 | xwing-data2 current plus errata printouts | To be defined; HotAC AI cards for this ruleset not yet supplied |
 
 A pack provides: ship and pilot catalog, upgrade catalog with slots, points or XP costs, maneuver dials, action bar, damage deck, AI card set, mission set, campaign rules module. The engine never branches on edition id; it calls pack interfaces.
 
@@ -128,3 +128,17 @@ Current implementation (v0.1): the whole app is a single `index.html` with inlin
 3. The two Drive folders: please upload the HotAC 1E rulebook, AI card set and mission books, since Drive is not reachable from here.
 4. Primary mode: pure table companion (recommended), or also an on-screen board with movement and dice?
 5. Hosting target: GitHub Pages under ianmcgo/xwing, or a custom domain such as cabalc.com?
+
+## 11. Update log
+
+### v0.2
+- XWA tab: game tracker (squad points, deficit mission points, 12 rounds, five phases, 20 mission point end condition) and the four standard scenarios, from the uploaded XWA rulebook. Scoring text is summarized for Satellite Array and Chance Engagement; Salvage Mission and Scramble the Transmissions point to the rulebook.
+- HotAC 2.07.04 (Tiernan conversion of Derksen's campaign) from the Campaign Book and Mission Pack: starting X-wing 10 XP and Y-wing 16 XP, XP shop with the rule costs, mission list for all five arcs with territory and turn limits, XP tally per mission, eject rolls by territory, banking XP.
+- Eject interpretation (mine, check against the book): each attack die is 3 hits, 2 crits, 2 focus, 1 blank. Two or more crits kill the pilot, one crit loses the most expensive talent, each hit loses the most expensive upgrade, one focus halves XP, two focus zero it. Lost cards are reported in the log and removed by hand because card costs are not tracked yet.
+
+### Newly supplied material
+- HOTAC Campaign Book and Mission Pack 2.07.04 (text extractable, used above), Optional Rules, Terrain stat cards, Additional Printable Materials, Alternate Pilot Abilities, Ground Assault campaign (book and components).
+- Elite Pilot Cards, Rebel Pilot Cards and Imperial Ship A.I. cards (FGA v7.3): image-only, need transcription before an AI engine can use them.
+- 1stEdition.zip: original campaign book, decks, stat cards, terrain.
+- CWCC-Entries.zip: community campaigns (Clone Wars, Pandemonium in the Aturi Cluster, Last Vestige of the Jedi, Heroes of the Old Republic) with droid AI cards and components.
+- Next: add Ground Assault and the community campaigns as campaign modules, transcribe AI cards.

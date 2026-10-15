@@ -15,3 +15,8 @@
 | infinitearenas.com | infinitearenas.com | no | Cards, cardboard, tokens |
 | YASB, xwing.life | yasb.app, xwing.life | no | Squad builder reference |
 | doweaver, xwingtmg2-inventory-rs | github.com | not yet checked | Inventory and tooling reference |
+| HotAC 2.07.04 Campaign Book, Mission Pack | uploaded | local | 2E campaign rules, 17 missions |
+| Elite/Rebel pilot cards, Imperial AI cards (FGA v7.3) | uploaded | local | Image-only, needs transcription |
+| Ground Assault, Optional Rules, Alternate Pilot Abilities | uploaded | local | Further modules |
+| 1stEdition.zip, CWCC-Entries.zip | uploaded | local | 1E book, community campaigns |
+| XWA Rulebook 1.1.1, Rules Reference 1.4.6, Errata 1.8.2 | uploaded | local | XWA rules |
