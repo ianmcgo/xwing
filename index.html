@@ -164,6 +164,14 @@ return {name:"",ship:ship,ps:S.module==="pallas"?2:1,xp:start,kills:0,upgrades:[
 }
 
 function viewCampaign(){
+var sub=S.campSub==="hangar"?"hangar":"main";
+var bar=h("div",{class:"row",style:"margin-bottom:12px"},[
+btn("Campaign",function(){S.campSub="main";refresh()},sub==="main"?"p":""),
+btn("Hangar",function(){S.campSub="hangar";refresh()},sub==="hangar"?"p":"")
+]);
+return h("div",{},[bar,sub==="hangar"?viewHangar():viewCampaignMain()]);
+}
+function viewCampaignMain(){
 var m=MODULES[S.module];
 var a=h("div",{class:"card"},[
 h("h2",{},"Campaign"),
@@ -1627,7 +1635,7 @@ btn("Remove",function(){sq.ships.splice(si,1);refresh()},"d")
 return h("div",{},[bar,out,h("div",{style:"height:12px"}),addp,h("div",{class:"grid g3",style:"margin-top:12px"},cards)]);
 }
 
-var TABS=[["pilots","Pilots",viewPilots],["campaign","Campaign",viewCampaign],["hangar","Hangar",viewHangar],["ai","AI Ships",viewAI],["missions","Missions",viewMissions],["builder","Squad Builder",viewBuilder],["browser","Database",viewBrowser],["docs","Rules and Books",viewDocs],["rules","Rules / Play",viewRules],["settings","Settings",viewSettings]];
+var TABS=[["pilots","Pilots",viewPilots],["campaign","Campaign",viewCampaign],["ai","AI Ships",viewAI],["missions","Missions",viewMissions],["builder","Squad Builder",viewBuilder],["browser","Database",viewBrowser],["docs","Rules and Books",viewDocs],["rules","Rules / Play",viewRules],["settings","Settings",viewSettings]];
 var TOOLIDS=["builder","browser","docs","rules","settings"];
 var toolsOpen=false;
 function render(){
