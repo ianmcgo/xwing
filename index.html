@@ -574,7 +574,11 @@ S.players.push(p);S.ck=S.players.length-1;CK.create=null;log("Pilot created: "+p
 },"p")
 ]);
 }
+var FORCE_SIDE={"Hate":"dark","Malice":"dark","Compassion":"light","Patience":"light"};
+var CLS_SIDE={oldschool:"light",resistance:"light",republic:"light",empire:"dark",firstorder:"dark",separatist:"dark"};
 function ckStatus(c,p,slots){
+var fs=FORCE_SIDE[c.name],ps_=CLS_SIDE[p.cls];
+if(fs&&ps_&&fs!==ps_)return(fs==="dark"?"Dark":"Light")+" side only";
 var ok=slots.some(function(s){return s.types.indexOf(c.slots[0])>=0});
 if(!ok){
 var later=(c.slots[0]==="Ace"||c.slots[0]==="Talent"||c.slots[0]==="Force Power")&&p.rank<2;

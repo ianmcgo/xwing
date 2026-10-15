@@ -250,3 +250,9 @@ The Resistance now starts in the BTA-NR2 Y-Wing (15 XP), RZ-2 A-Wing (8 XP) or T
 The First Order now starts in the TIE/fo Fighter (14 XP), TIE/sf Fighter (8 XP) or TIE/ba Interceptor (3 XP). The TIE/vn Silencer unlocks at initiative 4 or 5; the first is used, so it is rank 3 (initiative 4) at an estimated 12 XP, shown as "(estimate)".
 
 All of the starting XP values for the Empire, Republic, Separatists, Resistance and First Order came from the user and are not checked against a source.
+
+## 36. Force alignment
+
+Light and dark side is enforced only where the card data says so. In the 2nd edition data, only a few Force Power cards carry a side: Hate and Malice are dark, Compassion and Patience are light (Roiling Anger exists twice, once dark, and is left out because the two cards share a name here). A pilot on the light side (The Old School, The Resistance, The Galactic Republic) sees the dark ones as "Dark side only" in the upgrades window and cannot install them, and the other way round for the dark side (The Empire, The First Order, Separatists). Scum and Villainy pilots may use either. The Store hides cards a pilot cannot use unless the show-all box is ticked.
+
+The pasted Force rules (a Force ability costing double, or initiative times 4) were not applied. The store prices come from the HotAC 2.07 points list and the card costs, the pasted text disagrees with itself (times 2, times 4 and double), and nothing in it could be checked against a source. Force cards already need the required initiative and a slot that accepts them, and prices stay editable in the Store.
