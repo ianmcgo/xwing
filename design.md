@@ -187,3 +187,5 @@ Four community conversion classes were added beside the two HotAC 2.07 classes: 
 Slot bars for the new ships are built from the real 2nd edition ship data (the slots that most of that ship's pilots have, leaving out Talent, Force and Device since rank grants those). The summary's "Y-TIE" and "TYE-Wing" were left out because they are not real ships, and its 35 starting points were ignored because they conflict with the 10 XP start. Enemy AI decks for these factions are not included.
 
 On the create screen, once a faction is chosen the other faction cards are hidden, and a Back to factions button near the bottom clears the choice and shows them all again.
+
+The Trade Federation / Separatists class (Vulture Droid, Droid Tri-Fighter, Hyena Droid Bomber, Belbullab-22, Nantex-class) was added the same way, from another pasted community summary that could not be verified. Its slot bars come from the ship data; the Nantex has none beyond the rank slot. The catalog has no Tactical Relay cards yet, so that slot stays empty. The credits economy, the droid wingman and the Republic enemy AI are not built.
