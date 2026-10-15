@@ -202,3 +202,11 @@ Four buttons sit under the pilot name in the cockpit.
 ## 28. Legal line
 
 Every page ends with a footer reading: Unofficial fan tool, not affiliated with or endorsed by Lucas Films, Disney, Fantasy Flight Games or Atomic Mass Games. The credits sentence was removed from the landing page; the credits remain in README.md and docs/sources.md.
+
+## 29. Pirate Lords of the Aturi Cluster
+
+Pirate Lords of the Aturi Cluster (PLotAC), the Scum and Villainy campaign from evolvingdeveloper.com, is now an optional campaign module (Tools, Campaign, Campaign module). While it is selected, the Missions sub-tab shows its 31 missions in arcs: Introduction (Vape Bait), Mining Guild, Acts of Piracy, Illicit Activity, Rivals, Lost Loot, Bonus and the Pirate Hunter wrap-up. Each mission opens to a one-line summary, the objective and notes such as rewards and special rules, with Won, Lost and Clear buttons saved under `S.plotac`. Links point to the author's overview page, the easy-navigation rules page and the threat level calculator.
+
+The author publishes the campaign as web pages, with no PDF, so there is nothing to put in the library downloads. The summaries were written from those pages and are short; Rivals 6 and Lost Loot 5B are incomplete in the source, and the Letter of Marque missions beyond number 1 and the canyon mission's name were not found. Setups, enemy lists and maps stay on the author's site.
+
+PLotAC does not use the cockpit's XP and ranks: its pilots start at 0 XP and 0 credits with a career (Organizer, Professional, Gambler, Slicer, Gearhead, Demolitions, Cyborg or Miner) and spend credits. The cockpit does not model careers or credits yet.
