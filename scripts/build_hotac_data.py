@@ -28,6 +28,6 @@ for f in files:
             v=None
         text=s.get("ability") or s.get("text") or ""
         text=re.sub(r"<[^>]+>","",text)
-        cards.append([u["name"],slots,v or 0,text,ships,[x.lower() for x in sizes],",".join(other),s.get("image",""),1 if u.get("standard") else 0])
+        cards.append([u["name"],slots,v or 0,text,ships,[x.lower() for x in sizes],",".join(other),s.get("image",""),1 if u.get("standard") else 0,u.get("xws","")])
 json.dump(cards,open(out,"w"),ensure_ascii=False,separators=(",",":"))
 print(len(cards))

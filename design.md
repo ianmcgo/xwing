@@ -117,3 +117,7 @@ Modelled on screenshots of the former xwingunlimited.com. The Pilots tab is now 
 Data: `data/hotac_catalog.json` (304 Rebel-usable upgrades from xwing-data2, built by `scripts/build_hotac_data.py`) and `data/hotac_aces.json` (48 pilot ability cards, OCR of Dovi Anderson's Alternate Pilot Abilities PDF merged with names, XP and associated pilots from the HotAC 2nd Edition Ship and Ability Points List). Text from OCR may contain icon garbage; check it against the PDF in Rules and Books.
 
 Known gaps: only two classes are entered (The Old School, The Force User); the other classes, their ships and their rank grants are unknown. Ship slot bars for A-Wing, B-Wing, HWK-290, Eta-2 Actis and Delta-7 are guesses from xwing-data2 and the screenshots. Store prices are card cost values and the HotAC ability list; the original site showed different numbers for some cards, so every price is editable. Cards that use more than one slot occupy only their first slot.
+
+## 15. Card art from project-goldenrod
+
+CrazyVulcan/x-wing2.0-project-goldenrod holds images only (no card text): full cards in `src/images/En/pilots` and `En/upgrades`, cropped art in `Art/pilots` and `Art/upgrades`, all named by xws id. The cockpit Store uses `Art/upgrades/<xws>.jpg` from raw.githubusercontent.com, and the XWA online ship browser falls back to `En/pilots/<xws>.png` when the original image fails. Card text and costs still come from xwing-data2. Live image loading from the browser is untested from the build sandbox.
