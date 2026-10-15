@@ -240,6 +240,7 @@ var HC_CLASSES=[
 ];
 var HC_RANKCOST=[0,0,9,12,15,18];
 var HC_SHIPCOST=5;
+var HC_STARTXP=10;
 var HC_MAP=null;
 var GOLD="https://raw.githubusercontent.com/CrazyVulcan/x-wing2.0-project-goldenrod/main/src/images/";
 var CK={tab:"hand",q:"",slot:"All",pick:null,create:null,modal:false,mq:"",mslot:"All",mall:false,mlim:60};
@@ -326,7 +327,7 @@ h("div",{class:"note"},"Only two classes are entered so far. Send the other clas
 btn("Create pilot",function(){
 var p=newPlayer();
 p.name=C.name||"Pilot "+(S.players.length+1);
-p.cls=cls.id;p.ship=cls.start;p.rank=1;p.ps=2;p.owned={};p.owned[cls.start]=1;
+p.cls=cls.id;p.ship=cls.start;p.rank=1;p.ps=2;p.xp=HC_STARTXP;p.owned={};p.owned[cls.start]=1;
 S.players.push(p);S.ck=S.players.length-1;CK.create=null;log("Pilot created: "+p.name+" ("+cls.name+")");refresh();
 },"p")
 ]);
