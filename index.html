@@ -1188,6 +1188,53 @@ var E1_MISSIONS=[
 ["The Point of No Return campaign (CR90)","T3B","Punch It!","Rebel: CR90, 80 squad points; one unique ship at most, no large ships or unique upgrades.","Imperial: Colonel Jendon (ST-321, Flight Instructor), Backstabber, Turr Phennir (Veteran Instincts); 150 squad points.","Hyperdrive card collects six hyperdrive tokens, or destroy all Imperial ships.","Cripple the CR90 section holding the hyperdrive card."],
 ["The Point of No Return campaign (CR90)","T4","Minefield","Rebel: CR90, 100 squad points, one free upgrade per mission won.","Imperial: 240 squad points in four groups of 50-70 points.","CR90 flees off the Imperial edge.","Destroy the CR90."]
 ];
+function msheet(o){
+var old=document.getElementById("psheet");if(old)old.remove();
+var box="border:2px solid #000;padding:8px 10px;margin:0 0 10px;text-align:left";
+var cell="border:1px solid #000;padding:4px 8px;text-align:center";
+var sheet=h("div",{id:"psheet",style:"position:fixed;inset:0;z-index:2000;overflow:auto;background:#fff;color:#000;padding:16px;font-size:14px;line-height:1.4"},[
+h("div",{class:"noprint",style:"display:flex;gap:8px;margin-bottom:12px;justify-content:center"},[
+btn("Print",function(){window.print()},"p"),
+btn("Close",function(){sheet.remove();document.body.classList.remove("psheet-open")})
+]),
+h("div",{style:"max-width:760px;margin:0 auto"},[
+h("div",{style:"text-align:center;border-bottom:3px double #000;margin-bottom:10px;padding-bottom:6px"},[
+h("div",{style:"font-size:12px;letter-spacing:2px;text-transform:uppercase"},o.kicker||""),
+h("h1",{style:"margin:2px 0;font-size:28px;color:#000;letter-spacing:0"},o.title),
+h("div",{},o.sub||"")
+]),
+o.facts&&o.facts.length?h("table",{style:"border-collapse:collapse;width:100%;margin-bottom:10px"},[
+h("tr",{},o.facts.map(function(f){return h("th",{style:cell+";background:#ddd;color:#000"},f[0])})),
+h("tr",{},o.facts.map(function(f){return h("td",{style:cell},f[1])}))
+]):null
+].concat((o.blocks||[]).filter(function(b){return b[1]}).map(function(b){
+return h("div",{style:box},[h("div",{style:"font-weight:bold;text-transform:uppercase;font-size:12px;letter-spacing:1px;margin-bottom:3px"},b[0]),h("div",{},b[1])]);
+})).concat(o.tally?[
+h("div",{style:"font-weight:bold;text-transform:uppercase;font-size:12px;letter-spacing:1px;margin:6px 0 3px"},"Mission tally"),
+h("table",{style:"border-collapse:collapse;width:100%;margin-bottom:10px"},[h("tr",{},o.tally.map(function(x){return h("th",{style:cell+";background:#ddd;color:#000;font-size:11px"},x)}))].concat([0,1,2,3,4,5].map(function(){return h("tr",{style:"height:30px"},o.tally.map(function(){return h("td",{style:cell})}))}))),
+h("div",{style:box+";height:70px"},[h("div",{style:"font-weight:bold;text-transform:uppercase;font-size:12px;letter-spacing:1px"},"Result and notes"),h("div",{},"Won  /  Lost")])
+]:[]))
+]);
+document.body.appendChild(sheet);
+document.body.classList.add("psheet-open");
+}
+function printHotac(i){
+var m=HOTAC_MISSIONS[i],t=TERRITORY[m[2]];
+msheet({kicker:"Heroes of the Aturi Cluster · "+m[0],title:m[1],sub:m[2]+" territory",
+facts:[["Mission",String(i+1)],["Territory",m[2]],["Turn limit",String(m[3])],["Eject dice",String(t.dice)]],
+blocks:[["Escape",t.escape],["At the turn limit",t.end],["Setup","Use the mission card from the campaign book for this mission. Difficulty follows the average initiative of the pilots flying."]],
+tally:["Pilot","Damage","Kills","Large","Non-F TIE","Elite","Assists","Guardian","± Obj","Shot down","XP"]});
+}
+function print1E(m){
+msheet({kicker:"Official Missions · "+m[0],title:m[1]+" "+m[2],sub:"Rebel Alliance vs Galactic Empire",
+blocks:[["Rebel forces",m[3]],["Imperial forces",m[4]],["Rebel victory",m[5]],["Imperial victory",m[6]]],
+tally:["Player","Squad","Points","Ships lost","Notes"]});
+}
+function printPlotac(m){
+msheet({kicker:"Pirate Lords of the Aturi Cluster · "+m[0],title:m[1],sub:"Scum and Villainy",
+blocks:[["Briefing",m[2]],["Objective",m[3]],["Notes",m[4]]],
+tally:["Pilot","Damage","Kills","Credits","Shot down","XP"]});
+}
 function viewMissions1(){
 S.offm=S.offm||{};
 var groups={};
@@ -1211,7 +1258,8 @@ h("div",{},[h("b",{},"Imperial wins: "),m[6]]),
 h("div",{class:"row",style:"margin-top:8px"},[
 btn("Won",function(){S.offm[m[1]]="Won";refresh()}),
 btn("Lost",function(){S.offm[m[1]]="Lost";refresh()}),
-btn("Clear",function(){delete S.offm[m[1]];refresh()})
+btn("Clear",function(){delete S.offm[m[1]];refresh()}),
+btn("Print",function(){print1E(m)})
 ])
 ])
 ]);
@@ -1246,7 +1294,8 @@ m[4]?h("div",{},[h("b",{},"Notes: "),m[4]]):null,
 h("div",{class:"row",style:"margin-top:8px"},[
 btn("Won",function(){P.done[m[1]]="Won";refresh()}),
 btn("Lost",function(){P.done[m[1]]="Lost";refresh()}),
-btn("Clear",function(){delete P.done[m[1]];refresh()})
+btn("Clear",function(){delete P.done[m[1]];refresh()}),
+btn("Print",function(){printPlotac(m)})
 ])
 ])
 ]);
@@ -1268,7 +1317,7 @@ h("h2",{},"Missions"),
 h("div",{class:"dim"},"Difficulty follows the average initiative of the pilots flying: "+(avg?avg.toFixed(1):"no pilots")),
 h("div",{},Object.keys(arcs).map(function(a){return h("div",{style:"margin-top:10px"},[h("h3",{},a),h("table",{},arcs[a].map(function(x){
 var m=x[0],i=x[1],done=H.done[i];
-return h("tr",{class:H.cur===i?"hl":""},[h("td",{},m[1]),h("td",{},m[2]+" · "+m[3]+" turns"),h("td",{},done?h("span",{class:done==="win"?"ok":"bad"},done==="win"?"Won":"Lost"):""),h("td",{},btn("Fly",function(){H.cur=i;H.tally={};S.mission=i+1;log("Mission started: "+m[1]);refresh()}))]);
+return h("tr",{class:H.cur===i?"hl":""},[h("td",{},m[1]),h("td",{},m[2]+" · "+m[3]+" turns"),h("td",{},done?h("span",{class:done==="win"?"ok":"bad"},done==="win"?"Won":"Lost"):""),h("td",{},[btn("Fly",function(){H.cur=i;H.tally={};S.mission=i+1;log("Mission started: "+m[1]);refresh()}),btn("Print",function(){printHotac(i)})])]);
 }))])}))
 ]);
 var cur=H.cur!=null?HOTAC_MISSIONS[H.cur]:null;

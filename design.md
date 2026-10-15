@@ -268,3 +268,7 @@ The Rules / Play tab is gone. The Standard scenarios card now sits on the Campai
 ## 39. Print sheet layout
 
 The printed pilot sheet centers all text, and its tables shrink to fit their content and sit in the middle of the page.
+
+## 40. Printable missions
+
+Each mission list (HotAC, 1st Edition official, PLotAC) has a Print button. It opens a mission sheet in the same overlay as the pilot sheet: kicker and title, a facts row, boxed sections, a blank tally table and a result box. The sheets use only the mission text already stored in the app, so HotAC missions print name, territory, turn limit, eject dice, escape and turn-limit rules. The full setup text of the HotAC book missions is not in the data.
