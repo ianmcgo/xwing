@@ -151,3 +151,15 @@ A footer under every page links to Patreon (https://www.patreon.com/cw/ianmcg, s
 The footer shows total visits, visits today and the last 7 days; click it for the top countries. It uses the FreeSpace 4X Supabase project but its own table, `xwing_visits` (one row per UTC day and country), so X-Wing traffic never touches the FreeSpace counters. Two security-definer functions are exposed: `bump_xwing_visit` (adds one) and `get_xwing_stats` (read only); the table has row level security on and no direct access. A visit counts once per browser per UTC day. The country comes from the `cf-ipcountry` request header; `??` means unknown. The key in the page is the same publishable key FreeSpace 4x already ships.
 
 The star drift no longer reacts to page scrolling; stars move only with time.
+
+## 21. Card zoom
+
+Clicking an upgrade picture in the cockpit (the loadout, the store and the upgrades window) opens the full card in a dark overlay. A click anywhere, or Escape, closes it. It is added to the page body, so redraws of the cockpit do not remove it.
+
+## 22. Store filter and top bar
+
+The Store tab and the upgrades window list only cards the pilot can afford and could fit on the current ship. A checkbox shows everything. The season and mission line was removed from the top bar.
+
+## 23. Tab icon
+
+The browser tab icon is an inline SVG data link in the page head: a dark disc with a goldenrod ring, four wing strokes in an X with cyan engine tips and a red cockpit light. It is an original design, so it needs no extra file.

@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>X-Wing HotAC Companion</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><radialGradient id='g' cx='50%' cy='50%' r='50%'><stop offset='0' stop-color='%231a2a4a'/><stop offset='1' stop-color='%230a0f1c'/></radialGradient></defs><circle cx='32' cy='32' r='30' fill='url(%23g)' stroke='%23f4c430' stroke-width='3'/><path d='M12 14 L28 29 M52 14 L36 29 M12 50 L28 35 M52 50 L36 35' stroke='%23f4c430' stroke-width='5' stroke-linecap='round'/><path d='M32 18 L37 32 L32 46 L27 32 Z' fill='%23dbe8ff'/><circle cx='32' cy='30' r='3' fill='%23ff5a3c'/><circle cx='12' cy='14' r='2.5' fill='%237ff9ff'/><circle cx='52' cy='14' r='2.5' fill='%237ff9ff'/><circle cx='12' cy='50' r='2.5' fill='%237ff9ff'/><circle cx='52' cy='50' r='2.5' fill='%237ff9ff'/></svg>">
 <style>
 @media(max-width:760px){main .grid[style*="minmax(260px,340px)"]{grid-template-columns:1fr!important}}
 :root{--bg:#0b0f17;--panel:#131a26;--panel2:#1a2333;--line:#27324a;--text:#e6ecf5;--dim:#8fa0bd;--acc:#ffb84d;--acc2:#4da3ff;--bad:#ff6b6b;--good:#5fd18a}
@@ -60,7 +61,6 @@ footer.site .pat{border:1px solid var(--acc);border-radius:999px;padding:4px 14p
 <canvas id="stars" aria-hidden="true"></canvas>
 <header>
 <h1>X-WING HotAC COMPANION</h1>
-<span class="dim" id="subtitle"></span>
 <span class="sp"></span>
 <span class="dim">Edition</span>
 <select id="edSel" style="width:auto"></select>
@@ -288,9 +288,21 @@ function ckBadge(t){
 var m={Astromech:"AS",Torpedo:"TP",Missile:"MS",Turret:"TU",Cannon:"CN",Sensor:"SN",Payload:"PL",Crew:"CR",Gunner:"GN",Modification:"MD",Configuration:"CF",Title:"TI",Talent:"TA",Ace:"AC","Force Power":"FP",Illicit:"IL",Tech:"TC"};
 return h("span",{class:"tag",style:"padding:2px 6px;font-size:11px",title:t},m[t]||t.slice(0,2).toUpperCase());
 }
+function cardZoom(c){
+var old=document.getElementById("zoomov");if(old)old.remove();
+var ov=h("div",{id:"zoomov",style:"position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out"});
+var done=function(){ov.remove();document.removeEventListener("keydown",key)};
+var key=function(e){if(e.key==="Escape")done()};
+ov.addEventListener("click",done);
+document.addEventListener("keydown",key);
+ov.appendChild(cardImg("upgrades",c.xws,c.fb,true,"max-width:min(95vw,520px);max-height:92vh;object-fit:contain;border-radius:12px;box-shadow:0 0 30px #000",c.name));
+document.body.appendChild(ov);
+}
 function ckCardView(c,actions){
+var th=c.xws?cardImg("upgrades",c.xws,c.fb,false,"width:72px;height:72px;object-fit:cover;border-radius:6px;cursor:zoom-in",""):null;
+if(th)th.addEventListener("click",function(){cardZoom(c)});
 return h("div",{class:"card",style:"display:flex;gap:10px"},[
-c.xws?cardImg("upgrades",c.xws,c.fb,false,"width:72px;height:72px;object-fit:cover;border-radius:6px",""):null,
+th,
 h("div",{class:"f"},[
 h("div",{class:"row"},[h("b",{class:"f"},c.name),h("span",{class:"dim"},"XP "+ckPrice(c))]),
 h("div",{style:"margin:4px 0"},c.slots.map(ckBadge).concat(c.level?[h("span",{class:"dim"}," Initiative "+c.level+"+")]:[],c.pilot?[h("span",{class:"dim"}," · "+c.pilot)]:[])),
@@ -367,7 +379,7 @@ var all=Object.keys(hcMap());
 var rows=all.filter(function(n){
 var c=hcMap()[n];
 var st=ckStatus(c,p,slots);
-if(!CK.mall&&st)return false;
+if(!CK.mall&&(st||(!p.deck[n]&&(p.xp||0)<ckPrice(c))))return false;
 if(CK.mslot!=="All"&&c.slots.indexOf(CK.mslot)<0)return false;
 return!q||(c.name+" "+c.text).toLowerCase().indexOf(q)>=0;
 }).sort(function(a,b){var A=hcMap()[a],B=hcMap()[b];return A.slots[0].localeCompare(B.slots[0])||a.localeCompare(b)});
@@ -398,7 +410,7 @@ btn("Close",function(){CK.modal=false;render()},"p")
 h("div",{class:"row",style:"margin-top:8px"},[
 h("div",{class:"f"},field("Search",txt(CK.mq,function(v){CK.mq=v;CK.mlim=60;render()}))),
 h("div",{},field("Slot",sel(types,CK.mslot,function(v){CK.mslot=v;CK.mlim=60;render()}))),
-h("label",{style:"display:flex;gap:6px;align-items:center;text-transform:none;font-size:14px;color:var(--text)"},[h("input",{type:"checkbox",checked:CK.mall,onchange:function(e){CK.mall=e.target.checked;CK.mlim=60;render()}}),"Show every upgrade, even ones this ship can't use yet"])
+h("label",{style:"display:flex;gap:6px;align-items:center;text-transform:none;font-size:14px;color:var(--text)"},[h("input",{type:"checkbox",checked:CK.mall,onchange:function(e){CK.mall=e.target.checked;CK.mlim=60;render()}}),"Show every upgrade, even ones I can't afford or this ship can't use yet"])
 ]),
 h("div",{class:"dim",style:"margin:6px 0"},rows.length+" upgrades. Buy any of them; you can only install ones that fit a free or replaceable slot on the selected ship."),
 h("div",{},list),
@@ -487,7 +499,7 @@ if(CK.pick){var ps=slots.filter(function(s){return s.key===CK.pick})[0];dn=dn.fi
 listing=dn.map(function(n){var c=hcMap()[n];return ckCardView(c,[btn(hand.indexOf(n)>=0?"Equipped":"Equip",function(){ckEquip(p,n,CK.pick)},hand.indexOf(n)>=0?"p":"")])});
 if(!listing.length)listing=[h("div",{class:"card dim"},CK.pick?"No owned cards fit that slot. Buy some in the Store.":"Your deck is empty. Buy cards in the Store.")];
 }else{
-var all=Object.keys(hcMap()).filter(function(n){var c=hcMap()[n];return!p.deck[n]&&ckFits(c,p)});
+var all=Object.keys(hcMap()).filter(function(n){var c=hcMap()[n];if(p.deck[n])return false;if(CK.sall)return ckFits(c,p);return!ckStatus(c,p,slots)&&(p.xp||0)>=ckPrice(c)});
 all=filt(all).sort(function(a,b){return hcMap()[a].slots[0].localeCompare(hcMap()[b].slots[0])||a.localeCompare(b)});
 listing=all.slice(0,60).map(function(n){
 var c=hcMap()[n],price=ckPrice(c);
@@ -511,6 +523,7 @@ btn("Store",function(){CK.tab="store";CK.pick=null;render()},CK.tab==="store"?"p
 h("div",{class:"f"},txt(CK.q,function(v){CK.q=v;render()})),
 h("div",{},sel(types,CK.slot,function(v){CK.slot=v;render()}))
 ]),
+CK.tab==="store"?h("label",{style:"display:flex;gap:6px;align-items:center;text-transform:none;font-size:13px;color:var(--text)"},[h("input",{type:"checkbox",checked:!!CK.sall,onchange:function(e){CK.sall=e.target.checked;render()}}),"Show all, including cards I can't afford or equip yet"]):null,
 CK.pick?h("div",{class:"note"},"Choosing for slot "+CK.pick.replace(/#.*/,"")+". Tap the slot again to clear."):null
 ]),
 h("div",{},listing)
@@ -1737,8 +1750,6 @@ var TABS=[["pilots","Cockpit",viewPilots],["campaign","Campaign",viewCampaign],[
 var TOOLIDS=["campaign","ai","builder","browser","docs","rules","settings"];
 var toolsOpen=false;
 function render(){
-var sub=document.getElementById("subtitle");
-sub.textContent=MODULES[S.module].label+" · Season "+S.season+" · Mission "+S.mission;
 var es=document.getElementById("edSel");
 if(!es.options.length){Object.keys(EDITIONS).forEach(function(k){es.appendChild(h("option",{value:k},EDITIONS[k].label))});es.addEventListener("change",function(){S.edition=es.value;log("Edition: "+EDITIONS[S.edition].label);refresh()})}
 es.value=S.edition;
