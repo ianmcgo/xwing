@@ -349,7 +349,7 @@ return h("div",{class:"card",style:"max-width:820px;margin:0 auto"},[
 h("div",{class:"row"},[h("h2",{class:"f"},"Create new pilot"),btn("Cancel",function(){CK.create=null;render()})]),
 h("div",{class:"dim"},"Configure your pilot's identity, class and starting ship"),
 h("div",{style:"max-width:320px;margin:10px 0"},field("Callsign",txt(C.name,function(v){C.name=v}))),
-h("div",{class:"grid g3"},HC_CLASSES.map(function(c){
+h("div",{class:"grid g3"},HC_CLASSES.filter(function(c){return!C.cls||c.id===C.cls}).map(function(c){
 var on=c.id===C.cls;
 return h("div",{class:"card",style:"cursor:pointer;"+(on?"border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)":""),onclick:function(){if(C.cls!==c.id){C.cls=c.id;C.ship=null}render()}},[
 h("h3",{},c.name+(on?" ✔":"")),
@@ -371,6 +371,7 @@ h("div",{class:"dim"},"Starts with "+(HC_STARTXP[n]||10)+" XP")
 }))
 ]):h("div",{class:"dim",style:"margin:12px 0"},"Pick a class to see its starting ships."),
 h("div",{class:"note"},"The Old School and The Force User come from the HotAC 2.07 rules. The other four are community conversions with unverified ship lists; send corrections and they will be fixed."),
+cls?h("div",{style:"margin:8px 0"},btn("◀ Back to factions",function(){C.cls=null;C.ship=null;render()})):null,
 btn("Create pilot",function(){
 if(!cls||!C.ship){alert("Pick a class and a starting ship first");return}
 var p=newPlayer();
