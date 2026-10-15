@@ -173,3 +173,5 @@ The top bar reads, left to right: the title, the edition drop down, then (pushed
 The visitor log panel is hidden on screens up to 700px wide (phones); the globe and counting still run.
 
 The visitor files are loaded with a ?v= number; raise it whenever the files change so browsers do not keep an older copy.
+
+In the top bar the visitor log is a compact strip (the open-map footer line is hidden); clicking it still opens the globe.
