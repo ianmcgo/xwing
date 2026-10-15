@@ -105,3 +105,7 @@ The XWA Database tab now opens on embedded data (all 407 upgrades and 661 pilots
 XWA: no product contents data is available (xwing-data2 has none and the points PDFs have none), so there is no expansion tracking for XWA yet.
 
 Campaign library: Defenders of the Empire, Flight Group Alpha (with card pack and Imperial AI cards), Omega One and Battlestar Pallas PDFs are in `files/campaigns/` and appear in the Rules tab for both editions.
+
+## 13. Navigation
+
+Main tabs are the hero and campaign tools: Pilots (the hero builder, now the default), Campaign, Hangar, AI Ships and Missions. A Tools button opens a second row with Squad Builder (standard play), Database, Rules and Books, Rules / Play and Settings. Saved sessions that opened on the builder move to Pilots once.

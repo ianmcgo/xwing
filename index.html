@@ -84,7 +84,7 @@ var V1_FLAT="https://data.jsdelivr.com/v1/package/gh/voidstate/xwing-card-images
 var V1_BASE="https://cdn.jsdelivr.net/gh/voidstate/xwing-card-images@master";
 var KEY="xwing-hotac-companion-v1";
 
-function blank(){return {edition:"xwa",module:"hotac",hardcore:false,season:1,mission:1,pool:0,players:[],hangar:[],unlocked:[],pallas:{hull:0,energy:0,shields:0,tubes:0},owned:{},ownedCards:{},log:[],squad:[],tab:"builder",squads:[],sq:0}}
+function blank(){return {edition:"xwa",module:"hotac",hardcore:false,season:1,mission:1,pool:0,players:[],hangar:[],unlocked:[],pallas:{hull:0,energy:0,shields:0,tubes:0},owned:{},ownedCards:{},log:[],squad:[],tab:"pilots",squads:[],sq:0}}
 var S;
 try{S=Object.assign(blank(),JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){S=blank()}
 if(!S.ownedCards)S.ownedCards={};
@@ -1329,7 +1329,9 @@ btn("Remove",function(){sq.ships.splice(si,1);refresh()},"d")
 return h("div",{},[bar,out,h("div",{style:"height:12px"}),addp,h("div",{class:"grid g3",style:"margin-top:12px"},cards)]);
 }
 
-var TABS=[["builder","Builder",viewBuilder],["campaign","Campaign",viewCampaign],["pilots","Pilots",viewPilots],["hangar","Hangar",viewHangar],["ai","AI Ships",viewAI],["docs","Rules",viewDocs],["missions","Missions",viewMissions],["rules","Rules / Play",viewRules],["browser","Database",viewBrowser],["settings","Settings",viewSettings]];
+var TABS=[["pilots","Pilots",viewPilots],["campaign","Campaign",viewCampaign],["hangar","Hangar",viewHangar],["ai","AI Ships",viewAI],["missions","Missions",viewMissions],["builder","Squad Builder",viewBuilder],["browser","Database",viewBrowser],["docs","Rules and Books",viewDocs],["rules","Rules / Play",viewRules],["settings","Settings",viewSettings]];
+var TOOLIDS=["builder","browser","docs","rules","settings"];
+var toolsOpen=false;
 function render(){
 var sub=document.getElementById("subtitle");
 sub.textContent=MODULES[S.module].label+" · Season "+S.season+" · Mission "+S.mission;
@@ -1337,9 +1339,17 @@ var es=document.getElementById("edSel");
 if(!es.options.length){Object.keys(EDITIONS).forEach(function(k){es.appendChild(h("option",{value:k},EDITIONS[k].label))});es.addEventListener("change",function(){S.edition=es.value;log("Edition: "+EDITIONS[S.edition].label);refresh()})}
 es.value=S.edition;
 var nav=document.getElementById("nav");nav.innerHTML="";
-TABS.forEach(function(t){nav.appendChild(h("button",{class:S.tab===t[0]?"on":"",onclick:function(){S.tab=t[0];refresh()},type:"button"},t[1]))});
+var onTool=TOOLIDS.indexOf(S.tab)>=0;
+TABS.forEach(function(t){if(TOOLIDS.indexOf(t[0])>=0)return;nav.appendChild(h("button",{class:S.tab===t[0]?"on":"",onclick:function(){S.tab=t[0];toolsOpen=false;refresh()},type:"button"},t[1]))});
+nav.appendChild(h("button",{class:onTool?"on":"",onclick:function(){toolsOpen=!toolsOpen;render()},type:"button"},"Tools "+((toolsOpen||onTool)?"▴":"▾")));
+var nav2=document.getElementById("nav2");
+if(!nav2){nav2=h("nav",{id:"nav2"});nav.parentNode.insertBefore(nav2,nav.nextSibling)}
+nav2.innerHTML="";
+nav2.style.display=(toolsOpen||onTool)?"":"none";
+TABS.forEach(function(t){if(TOOLIDS.indexOf(t[0])<0)return;nav2.appendChild(h("button",{class:S.tab===t[0]?"on":"",onclick:function(){S.tab=t[0];toolsOpen=true;refresh()},type:"button"},t[1]))});
 var main=document.getElementById("main");main.innerHTML="";
 var t=TABS.filter(function(x){return x[0]===S.tab})[0]||TABS[0];
+if(!S.navv){S.navv=2;if(S.tab==="builder")S.tab="pilots";t=TABS.filter(function(x){return x[0]===S.tab})[0]||TABS[0]}
 main.appendChild(t[2]());
 }
 render();
