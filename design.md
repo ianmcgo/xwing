@@ -93,3 +93,7 @@ Known gaps: the PDFs do not separate Restricted from Banned, so Restricted cards
 ## 10. 1st Edition official missions
 
 `E1_MISSIONS` lists the 17 missions in the Official Missions PDF (M1 to M9, Hoth H1 to H3, Point of No Return T1 to T4), transcribed from OCR of the scanned booklet and shortened. The PDF is in `files/1e/` and listed in the Rules tab. Won/lost is tracked in `S.offm`. The booklet has no solo rules.
+
+## 11. XWA database tab
+
+The XWA Database tab now opens on embedded data (all 407 upgrades and 661 pilots with cost, slot, restrictions and Standard/Extended legality) with search, slot, faction and format filters, and works offline. Card text and art still come from xwing-data2 through the "Card text and art (online)" button.

@@ -319,13 +319,57 @@ DATA.loading=true;
 fetchJSON(V1_FLAT).then(function(d){DATA.v1files=d.files.map(function(f){return f.name}).filter(function(n){return/\.(png|jpg)$/i.test(n)});DATA.loading=false;render()}).catch(function(e){DATA.err=String(e.message||e);DATA.loading=false;render()});
 }
 function shipBase(p){return p.split("/").pop().replace(".json","")}
+var BRX={mode:"upgrades",q:"",type:"",fac:"",fmt:"",lim:150};
+function viewBrowserX(){
+var q=BRX.q.toLowerCase();
+var modes=h("div",{class:"row"},[["upgrades","Upgrades"],["pilots","Pilots"],["online","Card text and art (online)"]].map(function(m){
+return btn(m[1],function(){BRX.mode=m[0];BRX.lim=150;render()},BRX.mode===m[0]?"p":"");
+}));
+var types=Array.from(new Set(XWA.upgrades.reduce(function(a,u){return a.concat(u[2])},[]))).sort();
+var ctl=[
+h("div",{class:"f"},field("Search",txt(BRX.q,function(v){BRX.q=v;BRX.lim=150;render()}))),
+h("div",{class:"f"},field("Format legality",sel([["","Any"],["std","Legal in Standard"],["ext","Legal in Extended"]],BRX.fmt,function(v){BRX.fmt=v;render()})))
+];
+var rows=[];
+if(BRX.mode==="upgrades"){
+ctl.push(h("div",{class:"f"},field("Slot",sel([["","All"]].concat(types),BRX.type,function(v){BRX.type=v;BRX.lim=150;render()}))));
+XWA.upgrades.forEach(function(u){
+if(BRX.type&&u[2].indexOf(BRX.type)<0)return;
+if(BRX.fmt&&xlegal(u,5,BRX.fmt)!=="Yes")return;
+if(q&&(u[0]+" "+u[4]).toLowerCase().indexOf(q)<0)return;
+rows.push([(u[1]?"•".repeat(u[1])+" ":"")+u[0],u[2].join(" + "),u[3],u[4]||"",u[5],u[6]]);
+});
+rows.sort(function(a,b){return a[0].replace(/^•+ /,"").localeCompare(b[0].replace(/^•+ /,""))});
+}else{
+ctl.push(h("div",{class:"f"},field("Faction",sel([["","All"]].concat(XFAC),BRX.fac,function(v){BRX.fac=v;BRX.lim=150;render()}))));
+XWA.pilots.forEach(function(p){
+if(BRX.fac&&p[0]!==BRX.fac)return;
+if(BRX.fmt&&xlegal(p,9,BRX.fmt)!=="Yes")return;
+if(q&&(p[2]+" "+p[3]+" "+p[1]+" "+p[8]).toLowerCase().indexOf(q)<0)return;
+rows.push([(p[4]?"•".repeat(p[4])+" ":"")+p[2]+(p[3]?" - "+p[3]:""),p[0]+" · "+p[1],p[5],p[6]>=0?"Loadout "+p[6]+" · "+(p[7].join(", ")||"no bar"):"Standard loadout",p[9],p[10]]);
+});
+rows.sort(function(a,b){return a[1].localeCompare(b[1])||a[0].localeCompare(b[0])});
+}
+var shown=rows.slice(0,BRX.lim);
+var tbl=h("table",{},[h("tr",{},(BRX.mode==="upgrades"?["Card","Slot","Cost","Restrictions","Std","Ext"]:["Pilot","Faction · ship","Cost","Loadout","Std","Ext"]).map(function(t){return h("th",{},t)}))].concat(shown.map(function(r){
+return h("tr",{},r.map(function(c,i){return h("td",{class:i>=4?(c==="Yes"?"ok":"bad"):""},String(c))}));
+})));
+return h("div",{},[
+h("div",{class:"card"},[h("h2",{},"XWA database"),modes,BRX.mode==="online"?null:h("div",{class:"row"},ctl),
+h("div",{class:"dim"},BRX.mode==="online"?"":rows.length+" matches. Costs, restrictions and legality are from the 2024 points PDFs (Ship Points 2024-09-06, Upgrade Points 2024-11-01).")]),
+h("div",{class:"card",style:"overflow-x:auto"},[tbl,rows.length>shown.length?btn("Show more",function(){BRX.lim+=200;render()}):null])
+]);
+}
 function viewBrowser(){
+if(S.edition==="xwa"&&BRX.mode!=="online")return viewBrowserX();
+if(S.edition==="xwa"){var bk=btn("Back to XWA points data",function(){BRX.mode="upgrades";render()},"p")}
 var out=[];
 var top=h("div",{class:"card"},[
 h("div",{class:"row"},[
 h("div",{class:"f"},field("Search",txt(BR.q,function(v){BR.q=v;render()}))),
 h("label",{style:"display:flex;gap:6px;align-items:center;text-transform:none;font-size:14px;color:var(--text)"},[h("input",{type:"checkbox",checked:BR.ownedOnly,onchange:function(e){BR.ownedOnly=e.target.checked;render()}}),"Owned ships only"]),
-btn("Retry load",function(){DATA.err=null;render()})
+btn("Retry load",function(){DATA.err=null;render()}),
+bk||null
 ]),
 DATA.err?h("div",{class:"note bad"},"Could not load card data ("+esc(DATA.err)+"). Check your connection; the rest of the app works offline."):null
 ]);
