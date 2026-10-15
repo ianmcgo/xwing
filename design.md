@@ -117,3 +117,7 @@ The current `index.html` already contains the campaign trackers, an AI ship gene
 ## 14. XWA definition
 
 XWA is the X-Wing Alliance, a community organization running organized play and rules and points updates for X-Wing. A June 2025 roadmap article states it is a volunteer group formed in June 2024 with elected council, planned a Q4 2025 points update and a March 2026 world championship, and does not represent Lucasfilm or Asmodee. The article does not list its documents or version numbers, so the document list above comes from your description and is unverified. The XWA site and documents are not reachable from the build environment; they need uploading. The XWA edition then gets the same Rules tab treatment as 2.5 / AMG and its own builder rules (points scale, ban and restricted lists).
+
+## 15. XWA documents
+
+The three files uploaded as XWA material (rulebook v1.1.1, rules reference v1.4.6, errata v1.8.2) are byte-for-byte identical to the 2.5 / AMG files (matching checksums), so XWA uses the same rules documents and they are not stored twice. XWA's own 50P Points Companion, ban and restricted lists are still missing; the XWA builder waits on them.

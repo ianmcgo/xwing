@@ -178,7 +178,7 @@ btn("Mission complete (next mission)",function(){log("Mission "+S.mission+" comp
 btn("Next season",function(){S.season++;S.mission=1;log("Season "+S.season+" begins");refresh()})
 ]),
 S.edition==="2.5e"?h("div",{class:"note"},"2.5 / AMG uses the 2023 rulebook, rules reference and errata, and the 2024 points documents. Use the Rules tab to read them and the Rules / Play tab for the game tracker."):null,
-S.edition==="xwa"?h("div",{class:"note"},"XWA is the X-Wing Alliance community organization. Its points companion, rules, errata and ban list documents have not been added yet."):null
+S.edition==="xwa"?h("div",{class:"note"},"XWA is the X-Wing Alliance community organization. Its rulebook, rules reference and errata are the same files as 2.5 / AMG. Its own points companion and ban lists have not been added yet."):null
 ]);
 var b=h("div",{class:"card"},[
 h("h2",{},"Squadron"),
@@ -560,7 +560,7 @@ btn("Ship destroyed: add points",function(){P.mp+=Number(P._add)||0;P._add=0;xsa
 var lead=m.p1.mp>m.p2.mp?m.p1:m.p2.mp>m.p1.mp?m.p2:null;
 var endNow=lead&&lead.mp>=20;
 var setup=h("div",{class:"card"},[
-h("h2",{},"2.5 / AMG game tracker"),
+h("h2",{},EDITIONS[S.edition].label+" game tracker"),
 h("div",{class:"dim"},"Rulebook v1.1.1 (10/30/2023), Rules Reference v1.4.6, Errata v1.8.2. Ship points 09/06/2024, upgrade points 11/01/2024."),
 field("Maximum squad points",txt(m.max,function(v){m.max=v;xsave()},"number")),
 btn("Start game: award deficit mission points",function(){m.p1.mp=d2;m.p2.mp=d1;m.round=1;m.started=true;log("XWA game started. "+m.p1.name+" "+m.p1.mp+" MP, "+m.p2.name+" "+m.p2.mp+" MP");xsave()},"p"),
@@ -591,8 +591,7 @@ h("div",{},[
 return h("div",{class:"grid g2"},[setup,side(m.p1),side(m.p2),scen,rules]);
 }
 function viewRules(){
-if(S.edition==="xwa")return h("div",{class:"card"},"XWA rules documents have not been added yet, so there is no tracker for this edition.");
-if(S.edition==="2.5e")return viewXWA();
+if(S.edition==="2.5e"||S.edition==="xwa")return viewXWA();
 return viewHotacRules();
 }
 function viewHotacRules(){
@@ -626,6 +625,7 @@ var DOCS={
 ],
 "xwa":[]
 };
+DOCS.xwa=DOCS["2.5e"].filter(function(d){return d.kind!=="Points"});
 var DOC_WANTED=["Rulebook","Reference","Errata","Points"];
 var DOCSTATE={doc:null};
 function viewDocs(){
