@@ -68,9 +68,7 @@ var AI_RANGES=[["TIE Interceptor",1,6],["TIE Bomber",7,12],["TIE Advanced",13,16
 var AI_LEVELS=["Basic","Elite","PS4","PS6","PS8"];
 var EDITIONS={
 "1e":{label:"1st Edition",ps:"Pilot Skill",src:"v1"},
-"2e":{label:"2.0",ps:"Initiative",src:"v2",ref:"xwing-2.0"},
-"2.5e":{label:"2.5 / AMG",ps:"Initiative",src:"v2",ref:"3.9.1"},
-"xwa":{label:"XWA (X-Wing Alliance)",ps:"Initiative",src:"v2",ref:"3.9.1"}
+"xwa":{label:"XWA",ps:"Initiative",src:"v2",ref:"3.9.1"}
 };
 var MODULES={
 "hotac":{label:"Heroes of the Aturi Cluster 2.07",newShip:null},
@@ -86,10 +84,11 @@ var V1_FLAT="https://data.jsdelivr.com/v1/package/gh/voidstate/xwing-card-images
 var V1_BASE="https://cdn.jsdelivr.net/gh/voidstate/xwing-card-images@master";
 var KEY="xwing-hotac-companion-v1";
 
-function blank(){return {edition:"2e",module:"hotac",hardcore:false,season:1,mission:1,pool:0,players:[],hangar:[],unlocked:[],pallas:{hull:0,energy:0,shields:0,tubes:0},owned:{},ownedCards:{},log:[],squad:[],tab:"browser"}}
+function blank(){return {edition:"xwa",module:"hotac",hardcore:false,season:1,mission:1,pool:0,players:[],hangar:[],unlocked:[],pallas:{hull:0,energy:0,shields:0,tubes:0},owned:{},ownedCards:{},log:[],squad:[],tab:"browser"}}
 var S;
 try{S=Object.assign(blank(),JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){S=blank()}
 if(!S.ownedCards)S.ownedCards={};
+if(!EDITIONS[S.edition])S.edition="xwa";
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function log(t){S.log.unshift(new Date().toLocaleTimeString()+"  "+t);if(S.log.length>200)S.log.length=200}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -177,8 +176,7 @@ h("div",{class:"row",style:"margin-top:10px"},[
 btn("Mission complete (next mission)",function(){log("Mission "+S.mission+" complete (season "+S.season+")");S.mission++;refresh()},"p"),
 btn("Next season",function(){S.season++;S.mission=1;log("Season "+S.season+" begins");refresh()})
 ]),
-S.edition==="2.5e"?h("div",{class:"note"},"2.5 / AMG uses the 2023 rulebook, rules reference and errata, and the 2024 points documents. Use the Rules tab to read them and the Rules / Play tab for the game tracker."):null,
-S.edition==="xwa"?h("div",{class:"note"},"XWA is the X-Wing Alliance community organization. Its rulebook, rules reference and errata are the same files as 2.5 / AMG. Its own points companion and ban lists have not been added yet."):null
+S.edition==="xwa"?h("div",{class:"note"},"XWA uses the 2023 rulebook, rules reference and errata, and the 2024 points documents. Read them on the Rules tab; the game tracker is on Rules / Play."):null
 ]);
 var b=h("div",{class:"card"},[
 h("h2",{},"Squadron"),
@@ -396,7 +394,7 @@ h("div",{class:"note"},"Campaign data is stored in this browser (localStorage). 
 ]);
 var c=h("div",{class:"card"},[
 h("h2",{},"Sources"),
-h("div",{class:"dim"},"2E / 2.5E / XWA card data: xwing-data2 (MIT). 1E card images: voidstate/xwing-card-images. AI random tables: HotAC AI Ship Random Generator v0.5. Campaign rules: Heroes of the Aturi Cluster by Josh Derksen and community modules. Unofficial fan tool, not affiliated with or endorsed by Fantasy Flight Games, Atomic Mass Games or Lucasfilm.")
+h("div",{class:"dim"},"XWA card data: xwing-data2 (MIT). 1E card images: voidstate/xwing-card-images. AI random tables: HotAC AI Ship Random Generator v0.5. Campaign rules: Heroes of the Aturi Cluster by Josh Derksen and community modules. Unofficial fan tool, not affiliated with or endorsed by Fantasy Flight Games, Atomic Mass Games or Lucasfilm.")
 ]);
 return h("div",{class:"grid g2"},[a,b,c]);
 }
@@ -591,7 +589,7 @@ h("div",{},[
 return h("div",{class:"grid g2"},[setup,side(m.p1),side(m.p2),scen,rules]);
 }
 function viewRules(){
-if(S.edition==="2.5e"||S.edition==="xwa")return viewXWA();
+if(S.edition==="xwa")return viewXWA();
 return viewHotacRules();
 }
 function viewHotacRules(){
@@ -609,23 +607,20 @@ var items=[
 ];
 return h("div",{class:"grid g2"},[
 h("div",{class:"card"},[h("h2",{},"HotAC 2.07.04 rules summary"),h("div",{class:"dim"},"Conversion by Shaun Tiernan of the original by Josh Derksen."),h("table",{},items.map(function(x){return h("tr",{},[h("td",{style:"white-space:nowrap;color:var(--acc)"},x[0]),h("td",{},x[1])])}))]),
-h("div",{class:"card"},[h("h2",{},"Edition note"),h("div",{class:"note"},S.edition==="1e"?"The original first edition campaign book is in the 1stEdition download; its rules are not yet encoded here.":"These numbers come from the 2.07.04 conversion for second edition rules.")])
+h("div",{class:"card"},[h("h2",{},"Edition note"),h("div",{class:"note"},S.edition==="1e"?"The original first edition campaign book is in the 1stEdition download; its rules are not yet encoded here.":"HotAC 2.07.04 is a conversion for the newer rules; it is the campaign reference for XWA.")])
 ]);
 }
 
 var DOCS={
 "1e":[],
-"2e":[],
-"2.5e":[
-{kind:"Rulebook",title:"Rulebook",ver:"v1.1.1",date:"2023-10-30",file:"files/2.5/Rulebook_v1.1.1_2023-10-30.pdf",pages:24},
-{kind:"Reference",title:"Rules Reference",ver:"v1.4.6",date:"2023-09-15",file:"files/2.5/Rules_Reference_v1.4.6_2023-09-15.pdf",pages:49},
-{kind:"Errata",title:"Errata printouts",ver:"v1.8.2",date:"2023-08-28",file:"files/2.5/Errata_v1.8.2_2023-08-28.pdf",pages:16},
-{kind:"Points",title:"Ship Points",ver:"effective 2024-09-06",date:"2024-09-06",file:"files/2.5/Ship_Points_2024-09-06.pdf",pages:29},
-{kind:"Points",title:"Upgrade Points",ver:"effective 2024-11-01",date:"2024-11-01",file:"files/2.5/Upgrade_Points_2024-11-01.pdf",pages:19}
+"xwa":[
+{kind:"Rulebook",title:"Rulebook",ver:"v1.1.1",date:"2023-10-30",file:"files/xwa/Rulebook_v1.1.1_2023-10-30.pdf",pages:24},
+{kind:"Reference",title:"Rules Reference",ver:"v1.4.6",date:"2023-09-15",file:"files/xwa/Rules_Reference_v1.4.6_2023-09-15.pdf",pages:49},
+{kind:"Errata",title:"Errata printouts",ver:"v1.8.2",date:"2023-08-28",file:"files/xwa/Errata_v1.8.2_2023-08-28.pdf",pages:16},
+{kind:"Points",title:"Ship Points (AMG)",ver:"effective 2024-09-06",date:"2024-09-06",file:"files/xwa/Ship_Points_2024-09-06.pdf",pages:29},
+{kind:"Points",title:"Upgrade Points (AMG)",ver:"effective 2024-11-01",date:"2024-11-01",file:"files/xwa/Upgrade_Points_2024-11-01.pdf",pages:19}
 ],
-"xwa":[]
 };
-DOCS.xwa=DOCS["2.5e"].filter(function(d){return d.kind!=="Points"});
 var DOC_WANTED=["Rulebook","Reference","Errata","Points"];
 var DOCSTATE={doc:null};
 function viewDocs(){
@@ -643,7 +638,7 @@ h("a",{class:"b",href:d.file,download:d.file.split("/").pop(),style:"text-decora
 ]);
 })):h("div",{class:"note"},"No documents have been added for this edition yet."),
 missing.length?h("div",{class:"note"},"Still needed for this edition: "+missing.join(", ")+". Upload the file and it will appear here."):null,
-S.edition==="2.5e"||S.edition==="xwa"?h("div",{class:"dim",style:"margin-top:8px"},"Official rules and points documents are published at atomicmassgames.com/xwing-documents."):null
+null
 ]);
 var right=cur?h("div",{class:"card",style:"padding:0;overflow:hidden"},[
 h("div",{class:"row",style:"padding:8px 12px;border-bottom:1px solid var(--line)"},[h("b",{class:"f"},cur.title+" "+cur.ver),h("a",{href:cur.file,target:"_blank",rel:"noopener",style:"color:var(--acc2)"},"Open in new tab")]),
