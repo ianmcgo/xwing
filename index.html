@@ -197,7 +197,24 @@ S.module==="pallas"?h("div",{class:"note"},"Pallas: every ship starts at PS 2. N
 var c=h("div",{class:"card"},[h("h2",{},"Log"),h("div",{class:"log"},S.log.map(function(l){return h("div",{},l)})),h("div",{class:"row",style:"margin-top:8px"},[btn("Add note",function(){var t=prompt("Log note");if(t){log(t);refresh()}}),btn("Clear log",function(){S.log=[];refresh()})])]);
 return h("div",{class:"grid g2"},[a,b,c]);
 }
+function viewLanding(){
+return h("div",{class:"card",style:"max-width:760px;margin:0 auto;text-align:center"},[
+h("h1",{style:"margin:6px 0"},"Heroes of the Aturi Cluster"),
+h("div",{class:"dim"},"Pilot companion: build pilots, track XP and buy cards"),
+h("div",{style:"margin:16px auto;max-width:620px;color:#f4c430;font-style:italic;line-height:1.5"},[
+h("p",{},"Welcome to the Rebel Alliance, pilots. In this remote sector of the Outer Rim, our squadron is tasked with keeping the Rebellion alive after a series of crippling Imperial strikes against our positions. However, we must do so with fresh recruits and limited supplies."),
+h("p",{},"The Empire outnumbers us greatly here, with a planetary garrison on Nulan VI, and the Star Destroyer Retribution patrolling the system. Every operation we conduct requires a coordinated strike: we've got to hit them hard, fast, and fade away. There's no time to waste when the Retribution can drop out of hyperspace and provide Imperial reinforcements at a moment's notice. Our activity in this sector may prove crucial to the outcome of the Galactic Civil War."),
+h("p",{},"Perhaps you will become the heroes the Rebellion desperately needs.")
+]),
+h("div",{class:"row",style:"justify-content:center"},[
+btn("Enter cockpit",function(){S.introSeen=true;refresh()},"p"),
+btn("Create new pilot",function(){S.introSeen=true;S.players.push(newPlayer());log("Pilot added");refresh()})
+]),
+h("div",{class:"dim",style:"margin-top:14px;font-size:13px"},"Built on the work of Josh Derksen (creator of HotAC), Infinite Arenas, and Dovi Anderson (base classes and card edits). Unofficial fan tool, not affiliated with or endorsed by Fantasy Flight Games or Atomic Mass Games.")
+]);
+}
 function viewPilots(){
+if(!S.players.length&&!S.introSeen)return viewLanding();
 var kids=S.players.map(playerCard);
 if(!kids.length)kids=[h("div",{class:"card"},[h("p",{},"No pilots yet."),btn("Add pilot",function(){S.players.push(newPlayer());refresh()},"p")])];
 else kids.push(h("div",{class:"card"},btn("Add pilot",function(){S.players.push(newPlayer());refresh()},"p")));
