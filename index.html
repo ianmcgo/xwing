@@ -158,8 +158,8 @@ btn("+1 Kill",function(){p.kills++;log((p.name||"Pilot")+" kill");refresh()}),
 btn("Shot down",function(){
 var c=MODULES[S.module].newShip;
 if(c!=null){
-if(p.xp>=c){p.xp-=c;log((p.name||"Pilot")+" shot down, replacement ship −"+c+" XP")}
-else{p.xp-=1;p.ship="Z-95 Headhunter";log((p.name||"Pilot")+" shot down, rejoined in Z-95 (−1 XP)")}
+if(p.xp>=c){p.spent=(p.spent||0)+c;p.xp-=c;log((p.name||"Pilot")+" shot down, replacement ship −"+c+" XP")}
+else{p.spent=(p.spent||0)+1;p.xp-=1;p.ship="Z-95 Headhunter";log((p.name||"Pilot")+" shot down, rejoined in Z-95 (−1 XP)")}
 }else{log((p.name||"Pilot")+" shot down")}
 refresh()},"d")
 ]),
@@ -477,8 +477,8 @@ btn("Close",function(){sheet.remove();document.body.classList.remove("psheet-ope
 h("h1",{style:"margin:0;font-size:24px;color:#000;letter-spacing:0"},(p.name||"Pilot")+" · "+(cls?cls.name:p.cls)),
 h("div",{style:"margin:4px 0 10px"},(HC_EXPS[p.exp||"hotac"].label)+" pilot sheet · "+new Date().toLocaleDateString()+(p.exp==="plotac"?" · Career: "+(p.career||"none")+" · Credits: $"+(p.credits||0)+"k":"")),
 h("table",{style:"border-collapse:collapse;width:auto;max-width:100%;margin:0 auto 10px"},[
-th(["Ship","Rank","Initiative","XP","Kills"]),
-tr([p.ship,String(p.rank),String(p.ps),String(p.xp||0),String(p.kills||0)])
+th(["Ship","Rank","Initiative","XP to spend","XP spent","Total XP","Kills"]),
+tr([p.ship,String(p.rank),String(p.ps),String(p.xp||0),String(p.spent||0),String(xpTotal(p)),String(p.kills||0)])
 ]),
 h("div",{style:"margin-bottom:10px"},"Ships owned: "+(ships||p.ship)),
 h("div",{style:"margin-bottom:10px"},"Kills by ship type: "+(Object.keys(killCounts(p)).map(function(n){return n+" x"+killCounts(p)[n]}).join(", ")||"none logged")),
@@ -576,6 +576,8 @@ S.players.push(p);S.ck=S.players.length-1;CK.create=null;log("Pilot created: "+p
 }
 var FORCE_SIDE={"Hate":"dark","Malice":"dark","Compassion":"light","Patience":"light"};
 var CLS_SIDE={oldschool:"light",resistance:"light",republic:"light",empire:"dark",firstorder:"dark",separatist:"dark"};
+function xpTotal(p){return(Number(p.xp)||0)+(Number(p.spent)||0)}
+function xpTag(p){return"⚡ "+(p.xp||0)+" to spend · "+xpTotal(p)+" total"}
 function ckStatus(c,p,slots){
 var fs=FORCE_SIDE[c.name],ps_=CLS_SIDE[p.cls];
 if(fs&&ps_&&fs!==ps_)return(fs==="dark"?"Dark":"Light")+" side only";
@@ -607,7 +609,7 @@ var c=hcMap()[n],st=ckStatus(c,p,slots),owned=!!p.deck[n],price=ckPrice(c);
 var acts=[];
 if(!owned){
 var can=(p.xp||0)>=price;
-acts.push(btn("Buy ⚡ "+price,function(){if(!can){alert("Not enough XP");return}p.xp-=price;p.deck[n]=1;log(p.name+" bought "+n+" ("+price+" XP)");refresh()},can?"p":""));
+acts.push(btn("Buy ⚡ "+price,function(){if(!can){alert("Not enough XP");return}p.spent=(p.spent||0)+price;p.xp-=price;p.deck[n]=1;log(p.name+" bought "+n+" ("+price+" XP)");refresh()},can?"p":""));
 }else{
 acts.push(h("span",{class:"ok"},"Owned"));
 if(!st)acts.push(btn(hand.indexOf(n)>=0?"Installed":"Install",function(){ckEquip(p,n,null)},hand.indexOf(n)>=0?"p":""));
@@ -620,7 +622,7 @@ return h("div",{style:"position:fixed;inset:0;z-index:50;background:rgba(5,8,14,
 h("div",{class:"card",style:"max-width:900px;margin:0 auto;background:var(--panel)"},[
 h("div",{class:"row",style:"align-items:center"},[
 h("h2",{class:"f"},"Upgrades for the "+p.ship),
-h("span",{style:"color:#f4c430;font-size:18px"},"⚡ "+(p.xp||0)),
+h("span",{style:"color:#f4c430;font-size:18px"},xpTag(p)),
 btn("Close",function(){CK.modal=false;render()},"p")
 ]),
 h("div",{class:"row",style:"margin-top:8px"},[
@@ -645,7 +647,7 @@ var load=p.load[p.ship];
 var head=h("div",{class:"card"},[
 h("div",{class:"row",style:"align-items:center"},[
 h("b",{style:"font-size:18px"},cls.name),
-h("span",{style:"color:#f4c430;font-size:18px"},"⚡ "+(p.xp||0)),
+h("span",{style:"color:#f4c430;font-size:18px"},xpTag(p)),
 p.exp==="plotac"?h("span",{style:"color:#7ff9a8;font-size:18px"},"$"+(p.credits||0)+"k"):null,
 p.exp==="plotac"?h("span",{class:"dim"},"PLotAC · "+(p.career||"no career")):null,
 h("div",{class:"f"}),
@@ -688,7 +690,7 @@ return h("div",{class:"card",style:sel_?"background:#a35f0a;border-color:#f4c430
 h("b",{},n),
 h("div",{style:"margin:6px 0"},sh.bar.map(ckBadge)),
 sel_?h("div",{style:"color:#f4c430"},"Selected"):owned?btn("Select",function(){p.ship=n;p.load[n]=p.load[n]||{};CK.pick=null;refresh()}):
-shipUnlock(p,n)&&shipUnlock(p,n).story?btn("Unlocked by a story mission",function(){p.owned[n]=1;log(p.name+" unlocked "+n+" (story mission)");refresh()}):p.rank<shipRank(p,n)?h("div",{class:"dim"},"Locked until rank "+shipRank(p,n)+(shipUnlock(p,n)?" (estimate)":"")):btn("Buy ⚡ "+shipCost(p,n)+(shipUnlock(p,n)?" (estimate)":""),function(){if(!can){alert("Not enough XP");return}p.xp-=shipCost(p,n);p.owned[n]=1;log(p.name+" bought "+n);refresh()},can?"p":"")
+shipUnlock(p,n)&&shipUnlock(p,n).story?btn("Unlocked by a story mission",function(){p.owned[n]=1;log(p.name+" unlocked "+n+" (story mission)");refresh()}):p.rank<shipRank(p,n)?h("div",{class:"dim"},"Locked until rank "+shipRank(p,n)+(shipUnlock(p,n)?" (estimate)":"")):btn("Buy ⚡ "+shipCost(p,n)+(shipUnlock(p,n)?" (estimate)":""),function(){if(!can){alert("Not enough XP");return}p.spent=(p.spent||0)+shipCost(p,n);p.xp-=shipCost(p,n);p.owned[n]=1;log(p.name+" bought "+n);refresh()},can?"p":"")
 ]);
 }))
 ]);
@@ -700,7 +702,7 @@ var grants=r===1?"Initiative "+hcInit(p,1):"Initiative "+hcInit(p,r)+(r===3?" ·
 return h("div",{class:"card",style:done?"background:#a35f0a;border-color:#f4c430":(next?"":"opacity:.6")},[
 h("div",{class:"row"},[h("b",{class:"f"},"Rank "+r),h("span",{class:"dim"},"In "+hcInit(p,r))]),
 h("div",{class:"dim",style:"font-size:12px;margin:4px 0"},grants),
-done?h("div",{style:"color:#f4c430"},"Unlocked"):next?btn("Unlock ⚡ "+cost,function(){if((p.xp||0)<cost){alert("Not enough XP");return}p.xp-=cost;p.rank=r;p.ps=hcInit(p,r);log(p.name+" reached rank "+r);refresh()},(p.xp||0)>=cost?"p":""):h("div",{class:"dim"},"⚡ "+cost)
+done?h("div",{style:"color:#f4c430"},"Unlocked"):next?btn("Unlock ⚡ "+cost,function(){if((p.xp||0)<cost){alert("Not enough XP");return}p.spent=(p.spent||0)+cost;p.xp-=cost;p.rank=r;p.ps=hcInit(p,r);log(p.name+" reached rank "+r);refresh()},(p.xp||0)>=cost?"p":""):h("div",{class:"dim"},"⚡ "+cost)
 ]);
 }))
 ]);
@@ -731,7 +733,7 @@ var c=hcMap()[n],price=ckPrice(c);
 var locked=c.level&&p.ps<c.level;
 var can=!locked&&(p.xp||0)>=price;
 return ckCardView(c,[
-btn(locked?"Needs initiative "+c.level:"Buy ⚡ "+price,function(){if(!can){alert(locked?"Initiative too low":"Not enough XP");return}p.xp-=price;p.deck[n]=1;log(p.name+" bought "+n+" ("+price+" XP)");refresh()},can?"p":""),
+btn(locked?"Needs initiative "+c.level:"Buy ⚡ "+price,function(){if(!can){alert(locked?"Initiative too low":"Not enough XP");return}p.spent=(p.spent||0)+price;p.xp-=price;p.deck[n]=1;log(p.name+" bought "+n+" ("+price+" XP)");refresh()},can?"p":""),
 h("span",{style:"width:70px"},txt(price,function(v){S.hcPrice=S.hcPrice||{};S.hcPrice[n]=v;refresh()},"number")),
 h("span",{class:"dim",style:"font-size:11px"},"price")
 ]);
@@ -1136,7 +1138,7 @@ if(p.xp<cost){alert("Not enough XP");return}
 if(sh.kind==="ship"&&HOTAC_IN3.indexOf(sh.name)>=0&&Number(p.ps)<3&&!confirm("Unlocked at initiative 3. Buy anyway?"))return;
 if(sh.kind==="ability"||sh.kind==="force"){if(Number(p.ps)<Number(sh.base)&&!confirm("Your initiative is below the owner's. Buy anyway?"))return}
 if((sh.kind==="talent"||sh.kind==="ability"||sh.kind==="force")&&Number(p.ps)<3&&!confirm("Talent slots open at initiative 3. Buy anyway?"))return;
-p.xp-=cost;
+p.spent=(p.spent||0)+cost;p.xp-=cost;
 var nm=sh.name||sh.kind;
 if(sh.kind==="init"){p.ps=Number(p.ps)+1;nm="Initiative "+p.ps}
 else if(sh.kind==="ship"){p.ship=sh.name||p.ship}

@@ -272,3 +272,7 @@ The printed pilot sheet centers all text, and its tables shrink to fit their con
 ## 40. Printable missions
 
 Each mission list (HotAC, 1st Edition official, PLotAC) has a Print button. It opens a mission sheet in the same overlay as the pilot sheet: kicker and title, a facts row, boxed sections, a blank tally table and a result box. The sheets use only the mission text already stored in the app, so HotAC missions print name, territory, turn limit, eject dice, escape and turn-limit rules. The full setup text of the HotAC book missions is not in the data.
+
+## 41. Total XP and XP to spend
+
+Each pilot now tracks XP spent (`p.spent`) next to the XP balance (`p.xp`). The cockpit header and the upgrade store show the balance as "to spend" and balance plus spent as "total". Total XP counts starting XP and everything earned. Pilots saved before this change show their current balance as the total until they spend more.
