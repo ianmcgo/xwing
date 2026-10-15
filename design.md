@@ -198,3 +198,7 @@ Four buttons sit under the pilot name in the cockpit.
 - **Save pilot (JSON):** downloads `<callsign>-hotac-pilot.json` holding the whole pilot, with the format name `hotac-cockpit-pilot`.
 - **Load pilot:** reads such a file and adds it as a new pilot.
 - **Export for Infinite Arenas:** downloads `<callsign>-xws.json` in the XWS 2.0 squad format, which Infinite Arenas and other squad builders import. It holds one ship: the generic pilot of that ship nearest the pilot's initiative, plus the installed upgrades that exist as real cards. HotAC pilot abilities (Aces) are not real upgrade cards, so they are listed in the description instead. The points are the generic pilot's base cost, since HotAC XP is not squad points. The import into Infinite Arenas itself was not tested because the site could not be reached from here.
+
+## 28. Legal line
+
+Every page ends with a footer reading: Unofficial fan tool, not affiliated with or endorsed by Lucas Films, Disney, Fantasy Flight Games or Atomic Mass Games. The credits sentence was removed from the landing page; the credits remain in README.md and docs/sources.md.
