@@ -222,3 +222,13 @@ The note about default store prices at the bottom of the cockpit was removed.
 ## 31. Kills by ship type
 
 The Add kill button next to the Kills field opens a list of every 2nd edition ship type from the card data, with a search box and a faction filter. Each tap logs one kill of that type, adds one to the Kills total and stays open so several kills can be logged in a row; Other ship type takes a typed name. The pilot keeps the log in `killLog` (ship name and time). Under the pilot's name a row of tags shows the count per ship type; clicking a tag removes one of that type and lowers the total. The Kills number can still be typed by hand, which changes the total but not the log. The print sheet lists kills by ship type. Kills logged before this change show in the total only.
+
+## 32. The Empire class and unlock estimates
+
+The Empire class (Flight Group Alpha style) starts in the TIE/ln Fighter with 15 XP, the TIE/sa Bomber with 10 XP or the TIE/in Interceptor with 5 XP. Those starting values were supplied by the user and are not checked against a source. The higher ships unlock later, and the user asked for estimates. The numbers are guesses, shown with "(estimate)" in the hangar and kept in `HC_UNLOCK` so they are easy to change:
+
+- TIE Advanced x1: rank 2 (initiative 3), 8 XP
+- Alpha-class Star Wing: rank 3 (initiative 4), 10 XP
+- TIE/D Defender: rank 4 (initiative 5), 14 XP
+
+Every other ship keeps the standard rule of rank 2 and 5 XP. The slot bars come from the real ship data.

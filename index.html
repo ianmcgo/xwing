@@ -256,7 +256,13 @@ var HC_SHIPS={
 "Droid Tri-Fighter":{xws:"droidtrifighter",size:"small",cls:"Separatist",bar:["Modification","Modification","Configuration","Missile"]},
 "Hyena Droid Bomber":{xws:"hyenaclassdroidbomber",size:"small",cls:"Separatist",bar:["Modification","Configuration"]},
 "Belbullab-22":{xws:"belbullab22starfighter",size:"small",cls:"Separatist",bar:["Modification","Modification","Tactical Relay"]},
-"Nantex":{xws:"nantexclassstarfighter",size:"small",cls:"Separatist",bar:[]}
+"Nantex":{xws:"nantexclassstarfighter",size:"small",cls:"Separatist",bar:[]},
+"TIE/ln Fighter":{xws:"tielnfighter",size:"small",cls:"Imperial",bar:["Modification"]},
+"TIE/sa Bomber":{xws:"tiesabomber",size:"small",cls:"Imperial",bar:["Missile","Modification","Torpedo","Gunner"]},
+"TIE/in Interceptor":{xws:"tieininterceptor",size:"small",cls:"Imperial",bar:["Configuration","Modification"]},
+"TIE Advanced x1":{xws:"tieadvancedx1",size:"small",cls:"Imperial",bar:["Sensor","Missile","Modification"]},
+"Alpha-class Star Wing":{xws:"alphaclassstarwing",size:"small",cls:"Imperial",bar:["Sensor","Modification","Configuration"]},
+"TIE/D Defender":{xws:"tieddefender",size:"small",cls:"Imperial",bar:["Sensor","Cannon","Missile","Configuration"]}
 };
 var HC_CLASSES=[
 {id:"oldschool",name:"The Old School",desc:"A traditional Rebel pilot who starts in an X-Wing and buys more ships as they rank up.",start:"X-Wing",starts:["X-Wing","Y-Wing"],more:["Y-Wing","A-Wing","B-Wing","HWK-290"]},
@@ -264,6 +270,7 @@ var HC_CLASSES=[
 {id:"scum",name:"Scum and Villainy",desc:"A pilot from the galaxy's underworld: smugglers, pirates and bounty hunters flying cobbled-together fighters.",start:"Z-95 Headhunter",starts:["Z-95 Headhunter","Y-Wing","HWK-290","Mining Guild TIE"],more:["Y-Wing","HWK-290","Mining Guild TIE"],fan:true},
 {id:"resistance",name:"The Resistance",desc:"A fighter pilot of the Resistance, flying the newest generation of Rebel starfighters.",start:"T-70 X-Wing",starts:["T-70 X-Wing","RZ-2 A-Wing"],more:["RZ-2 A-Wing"],fan:true},
 {id:"firstorder",name:"The First Order",desc:"An elite trainee of the First Order who climbs from TIE fighters toward the Silencer.",start:"TIE/fo Fighter",starts:["TIE/fo Fighter","TIE/sf Fighter"],more:["TIE/sf Fighter","TIE/vn Silencer"],fan:true},
+{id:"empire",name:"The Empire",desc:"An Imperial TIE pilot in the Flight Group Alpha style, starting in a TIE fighter, bomber or interceptor and working up to the advanced TIE designs.",start:"TIE/ln Fighter",starts:["TIE/ln Fighter","TIE/sa Bomber","TIE/in Interceptor"],more:["TIE/sa Bomber","TIE/in Interceptor","TIE Advanced x1","Alpha-class Star Wing","TIE/D Defender"],fan:true},
 {id:"separatist",name:"Separatists",desc:"A droid commander or corporate officer of the Separatist Alliance, fighting with swarm tactics and networked droid fighters.",start:"Vulture Droid",starts:["Vulture Droid","Droid Tri-Fighter","Hyena Droid Bomber","Belbullab-22","Nantex"],more:["Droid Tri-Fighter","Hyena Droid Bomber","Belbullab-22","Nantex"],fan:true},
 {id:"republic",name:"The Galactic Republic",desc:"A clone-war era pilot of the Republic navy, flying Torrents, Headhunters and Jedi starfighters.",start:"V-19 Torrent",starts:["V-19 Torrent","Clone Z-95 Headhunter","Delta-7"],more:["Clone Z-95 Headhunter","Delta-7"],fan:true}
 ];
@@ -273,7 +280,10 @@ var PLOTAC_CAREERS=[["Organizer","Escape Craft with Novice Technician"],["Profes
 function hcInit(p,r){return r+(p.exp==="plotac"?0:1)}
 function hcExpOptions(cls){return cls&&cls.id==="scum"?["hotac","plotac"]:["hotac"]}
 var HC_SHIPCOST=5;
-var HC_STARTXP={"X-Wing":10,"Y-Wing":16};
+var HC_STARTXP={"X-Wing":10,"Y-Wing":16,"TIE/ln Fighter":15,"TIE/sa Bomber":10,"TIE/in Interceptor":5};
+var HC_UNLOCK={"TIE Advanced x1":{rank:2,cost:8},"Alpha-class Star Wing":{rank:3,cost:10},"TIE/D Defender":{rank:4,cost:14}};
+function shipRank(n){return HC_UNLOCK[n]?HC_UNLOCK[n].rank:2}
+function shipCost(n){return HC_UNLOCK[n]?HC_UNLOCK[n].cost:HC_SHIPCOST}
 var HC_MAP=null;
 var GOLD="https://raw.githubusercontent.com/CrazyVulcan/x-wing2.0-project-goldenrod/main/src/images/";
 var CK={tab:"hand",q:"",slot:"All",pick:null,create:null,modal:false,mq:"",mslot:"All",mall:false,mlim:60};
@@ -660,12 +670,12 @@ var ships=h("div",{class:"card"},[
 h("h3",{},"Ships"),
 h("div",{class:"grid g3"},Object.keys(HC_SHIPS).filter(function(n){return cls.more.indexOf(n)>=0||cls.start===n||p.owned[n]}).map(function(n){
 var owned=!!p.owned[n],sel_=p.ship===n,sh=HC_SHIPS[n];
-var can=!owned&&p.rank>=2&&(p.xp||0)>=HC_SHIPCOST;
+var can=!owned&&p.rank>=shipRank(n)&&(p.xp||0)>=shipCost(n);
 return h("div",{class:"card",style:sel_?"background:#a35f0a;border-color:#f4c430":(owned?"":"opacity:.75")},[
 h("b",{},n),
 h("div",{style:"margin:6px 0"},sh.bar.map(ckBadge)),
 sel_?h("div",{style:"color:#f4c430"},"Selected"):owned?btn("Select",function(){p.ship=n;p.load[n]=p.load[n]||{};CK.pick=null;refresh()}):
-p.rank<2?h("div",{class:"dim"},"Locked until rank 2"):btn("Buy ⚡ "+HC_SHIPCOST,function(){if(!can){alert("Not enough XP");return}p.xp-=HC_SHIPCOST;p.owned[n]=1;log(p.name+" bought "+n);refresh()},can?"p":"")
+p.rank<shipRank(n)?h("div",{class:"dim"},"Locked until rank "+shipRank(n)+(HC_UNLOCK[n]?" (estimate)":"")):btn("Buy ⚡ "+shipCost(n)+(HC_UNLOCK[n]?" (estimate)":""),function(){if(!can){alert("Not enough XP");return}p.xp-=shipCost(n);p.owned[n]=1;log(p.name+" bought "+n);refresh()},can?"p":"")
 ]);
 }))
 ]);
