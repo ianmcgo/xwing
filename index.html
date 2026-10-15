@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>X-Wing HotAC Companion</title>
 <style>
+@media(max-width:760px){main .grid[style*="minmax(260px,340px)"]{grid-template-columns:1fr!important}}
 :root{--bg:#0b0f17;--panel:#131a26;--panel2:#1a2333;--line:#27324a;--text:#e6ecf5;--dim:#8fa0bd;--acc:#ffb84d;--acc2:#4da3ff;--bad:#ff6b6b;--good:#5fd18a}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,Segoe UI,Roboto,sans-serif}
@@ -67,9 +68,9 @@ var AI_RANGES=[["TIE Interceptor",1,6],["TIE Bomber",7,12],["TIE Advanced",13,16
 var AI_LEVELS=["Basic","Elite","PS4","PS6","PS8"];
 var EDITIONS={
 "1e":{label:"1st Edition",ps:"Pilot Skill",src:"v1"},
-"2e":{label:"2nd Edition",ps:"Initiative",src:"v2"},
-"2.5e":{label:"2.5 Edition",ps:"Initiative",src:"v2"},
-"xwa":{label:"XWA Edition",ps:"Initiative",src:"v2"}
+"2e":{label:"2.0",ps:"Initiative",src:"v2",ref:"xwing-2.0"},
+"2.5e":{label:"2.5 / AMG",ps:"Initiative",src:"v2",ref:"3.9.1"},
+"xwa":{label:"XWA",ps:"Initiative",src:"v2",ref:"3.9.1"}
 };
 var MODULES={
 "hotac":{label:"Heroes of the Aturi Cluster 2.07",newShip:null},
@@ -80,7 +81,7 @@ var MODULES={
 };
 var PALLAS_START=[["X-Wing",5],["Y-Wing",8],["A-Wing",10],["HWK-290",10],["B-Wing",4],["YT-1300",-2],["Attack Shuttle",8],["ARC-170",4],["U-Wing",3],["Scurrgh H-6",1],["Auzituck",1],["B/SF-17",-1]];
 var PALLAS_UNLOCK=[["HWK290 Alliance Overhaul","Season 1","-",10],["A-Wing Mass Production Model","Season 1","-",2],["A-Wing Mark II","Season 2","-",6],["A-Wing Mark III","Season 3","-",16],["T65B X-Wing","Season 1","-",12],["T65AC4 X-Wing","Season 1","-",2],["ACT65 X-Wing","Season 1","-",5],["BTL-S3 Y-Wing","Season 1","-",1],["YT-1300 Combat Refit","Season 1","Special Mission 5",20],["B-Wing B6 Prototype","Season 2","-",6],["T70 X-Wing","Season 2","Special Mission 2",20],["YT-2400","Season 2","Special Mission 6",10],["K-Wing","Season 3","Special Mission 3",25],["E-Wing","Season 3","Special Mission 4",24]];
-var V2_BASE="https://cdn.jsdelivr.net/gh/xwingtmg/xwing-data2@master/";
+function v2base(){return"https://cdn.jsdelivr.net/gh/xwingtmg/xwing-data2@"+(EDITIONS[S.edition].ref||"master")+"/"}
 var V1_FLAT="https://data.jsdelivr.com/v1/package/gh/voidstate/xwing-card-images@master/flat";
 var V1_BASE="https://cdn.jsdelivr.net/gh/voidstate/xwing-card-images@master";
 var KEY="xwing-hotac-companion-v1";
@@ -175,8 +176,8 @@ h("div",{class:"row",style:"margin-top:10px"},[
 btn("Mission complete (next mission)",function(){log("Mission "+S.mission+" complete (season "+S.season+")");S.mission++;refresh()},"p"),
 btn("Next season",function(){S.season++;S.mission=1;log("Season "+S.season+" begins");refresh()})
 ]),
-S.edition==="xwa"?h("div",{class:"note"},"XWA uses the 2023 rulebook, rules reference and errata. Use the Rules / Play tab for the game tracker."):null,
-S.edition==="2.5e"?h("div",{class:"note"},"2.5 uses current xwing-data2 points and errata."):null
+S.edition==="2.5e"?h("div",{class:"note"},"2.5 / AMG uses the 2023 rulebook, rules reference and errata, and the 2024 points documents. Use the Rules tab to read them and the Rules / Play tab for the game tracker."):null,
+S.edition==="xwa"?h("div",{class:"note"},"XWA rules documents have not been added yet."):null
 ]);
 var b=h("div",{class:"card"},[
 h("h2",{},"Squadron"),
@@ -299,18 +300,19 @@ return h("tr",{class:AI.cur&&AI.cur.roll===r[0]?"hl":""},r.map(function(c){retur
 return h("div",{class:"grid g2"},[left,sq,hist,tbl]);
 }
 
-var DATA={v2manifest:null,v2ships:{},v1files:null,err:null,loading:false};
+var DATA={v2manifest:null,v2ships:{},v1files:null,err:null,loading:false,ref:null};
 var BR={q:"",faction:"rebelalliance",ship:null,ownedOnly:false};
 function fetchJSON(u){return fetch(u).then(function(r){if(!r.ok)throw new Error(r.status+" "+u);return r.json()})}
 function loadV2Manifest(){
+if(DATA.ref!==v2base()){DATA.ref=v2base();DATA.v2manifest=null;DATA.v2ships={};DATA.err=null}
 if(DATA.v2manifest||DATA.loading||DATA.err)return;
 DATA.loading=true;
-fetchJSON(V2_BASE+"data/manifest.json").then(function(m){DATA.v2manifest=m;DATA.loading=false;render()}).catch(function(e){DATA.err=String(e.message||e);DATA.loading=false;render()});
+fetchJSON(v2base()+"data/manifest.json").then(function(m){DATA.v2manifest=m;DATA.loading=false;render()}).catch(function(e){DATA.err=String(e.message||e);DATA.loading=false;render()});
 }
 function loadShip(path){
 if(DATA.v2ships[path])return;
 DATA.v2ships[path]="loading";
-fetchJSON(V2_BASE+path).then(function(d){DATA.v2ships[path]=d;render()}).catch(function(e){DATA.v2ships[path]={error:String(e.message||e)};render()});
+fetchJSON(v2base()+path).then(function(d){DATA.v2ships[path]=d;render()}).catch(function(e){DATA.v2ships[path]={error:String(e.message||e)};render()});
 }
 function loadV1(){
 if(DATA.v1files||DATA.loading||DATA.err)return;
@@ -566,8 +568,8 @@ btn("Ship destroyed: add points",function(){P.mp+=Number(P._add)||0;P._add=0;xsa
 var lead=m.p1.mp>m.p2.mp?m.p1:m.p2.mp>m.p1.mp?m.p2:null;
 var endNow=lead&&lead.mp>=20;
 var setup=h("div",{class:"card"},[
-h("h2",{},"XWA game tracker"),
-h("div",{class:"dim"},"Rulebook v1.1.1 (10/30/2023), Rules Reference v1.4.6, Errata v1.8.2."),
+h("h2",{},"2.5 / AMG game tracker"),
+h("div",{class:"dim"},"Rulebook v1.1.1 (10/30/2023), Rules Reference v1.4.6, Errata v1.8.2. Ship points 09/06/2024, upgrade points 11/01/2024."),
 field("Maximum squad points",txt(m.max,function(v){m.max=v;xsave()},"number")),
 btn("Start game: award deficit mission points",function(){m.p1.mp=d2;m.p2.mp=d1;m.round=1;m.started=true;log("XWA game started. "+m.p1.name+" "+m.p1.mp+" MP, "+m.p2.name+" "+m.p2.mp+" MP");xsave()},"p"),
 h("div",{class:"row",style:"margin-top:12px"},[h("div",{class:"big"},"Round "+m.round+" / 12"),btn("Next round",function(){if(m.round<12){m.round++;xsave()}else alert("Round 12 was the last round")}),btn("Back",function(){if(m.round>1){m.round--;xsave()}}),btn("Reset game",function(){m.p1.mp=0;m.p2.mp=0;m.round=1;m.started=false;xsave()},"d")]),
@@ -597,7 +599,8 @@ h("div",{},[
 return h("div",{class:"grid g2"},[setup,side(m.p1),side(m.p2),scen,rules]);
 }
 function viewRules(){
-if(S.edition==="xwa")return viewXWA();
+if(S.edition==="xwa")return h("div",{class:"card"},"No XWA rules have been added yet, so there is no tracker for this edition.");
+if(S.edition==="2.5e")return viewXWA();
 return viewHotacRules();
 }
 function viewHotacRules(){
@@ -619,7 +622,46 @@ h("div",{class:"card"},[h("h2",{},"Edition note"),h("div",{class:"note"},S.editi
 ]);
 }
 
-var TABS=[["campaign","Campaign",viewCampaign],["pilots","Pilots",viewPilots],["hangar","Hangar",viewHangar],["ai","AI Ships",viewAI],["missions","Missions",viewMissions],["rules","Rules / Play",viewRules],["browser","Cards",viewBrowser],["settings","Settings",viewSettings]];
+var DOCS={
+"1e":[],
+"2e":[],
+"2.5e":[
+{kind:"Rulebook",title:"Rulebook",ver:"v1.1.1",date:"2023-10-30",file:"files/2.5/Rulebook_v1.1.1_2023-10-30.pdf",pages:24},
+{kind:"Reference",title:"Rules Reference",ver:"v1.4.6",date:"2023-09-15",file:"files/2.5/Rules_Reference_v1.4.6_2023-09-15.pdf",pages:49},
+{kind:"Errata",title:"Errata printouts",ver:"v1.8.2",date:"2023-08-28",file:"files/2.5/Errata_v1.8.2_2023-08-28.pdf",pages:16},
+{kind:"Points",title:"Ship Points",ver:"effective 2024-09-06",date:"2024-09-06",file:"files/2.5/Ship_Points_2024-09-06.pdf",pages:29},
+{kind:"Points",title:"Upgrade Points",ver:"effective 2024-11-01",date:"2024-11-01",file:"files/2.5/Upgrade_Points_2024-11-01.pdf",pages:19}
+],
+"xwa":[]
+};
+var DOC_WANTED=["Rulebook","Reference","Errata","Points"];
+var DOCSTATE={doc:null};
+function viewDocs(){
+var list=DOCS[S.edition]||[];
+var have={};list.forEach(function(d){have[d.kind]=true});
+var missing=DOC_WANTED.filter(function(k){return!have[k]});
+var cur=list.filter(function(d){return d.file===DOCSTATE.doc})[0]||list[0];
+var left=h("div",{class:"card"},[
+h("h2",{},EDITIONS[S.edition].label+" documents"),
+list.length?h("div",{},list.map(function(d){
+return h("div",{style:"padding:8px 0;border-bottom:1px dashed var(--line)"},[
+h("div",{class:"row"},[h("div",{class:"f"},[h("b",{},d.title),h("div",{class:"dim"},d.kind+" · "+d.ver+" · "+d.pages+" pages")]),
+btn("Read",function(){DOCSTATE.doc=d.file;render()},cur&&cur.file===d.file?"p":""),
+h("a",{class:"b",href:d.file,download:d.file.split("/").pop(),style:"text-decoration:none;color:var(--text);padding:7px 12px;border:1px solid var(--line);border-radius:6px"},"Download")])
+]);
+})):h("div",{class:"note"},"No documents have been added for this edition yet."),
+missing.length?h("div",{class:"note"},"Still needed for this edition: "+missing.join(", ")+". Upload the file and it will appear here."):null,
+S.edition==="2.5e"||S.edition==="xwa"?h("div",{class:"dim",style:"margin-top:8px"},"Official rules and points documents are published at atomicmassgames.com/xwing-documents."):null
+]);
+var right=cur?h("div",{class:"card",style:"padding:0;overflow:hidden"},[
+h("div",{class:"row",style:"padding:8px 12px;border-bottom:1px solid var(--line)"},[h("b",{class:"f"},cur.title+" "+cur.ver),h("a",{href:cur.file,target:"_blank",rel:"noopener",style:"color:var(--acc2)"},"Open in new tab")]),
+h("iframe",{src:cur.file+"#view=FitH",title:cur.title,style:"width:100%;height:78vh;border:0;background:#fff"}),
+h("div",{class:"dim",style:"padding:8px 12px"},"If the reader does not show on your device, use Open in new tab or Download.")
+]):h("div",{class:"card dim"},"Select an edition with documents to read them here.");
+return h("div",{class:"grid",style:"grid-template-columns:minmax(260px,340px) 1fr;align-items:start"},[left,right]);
+}
+
+var TABS=[["campaign","Campaign",viewCampaign],["pilots","Pilots",viewPilots],["hangar","Hangar",viewHangar],["ai","AI Ships",viewAI],["docs","Rules",viewDocs],["missions","Missions",viewMissions],["rules","Rules / Play",viewRules],["browser","Cards",viewBrowser],["settings","Settings",viewSettings]];
 function render(){
 var sub=document.getElementById("subtitle");
 sub.textContent=MODULES[S.module].label+" · Season "+S.season+" · Mission "+S.mission;

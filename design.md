@@ -4,7 +4,7 @@
 
 A single-page web app, hosted at ianmcgo.github.io/xwing, that does three things:
 
-1. Squad builder for five editions.
+1. Squad builder for four editions.
 2. Database of ships, pilots, upgrades and cards with card art.
 3. Reference library for campaigns and rules (HotAC and its community descendants, plus each edition's rules).
 
@@ -16,13 +16,12 @@ Not in scope: an on-screen board, movement, dice, or online play. The campaign t
 | --- | --- | --- | --- |
 | 1st Edition | 100 points, pilot skill | guidokessels/xwing-data (297 pilots, 367 upgrades, 56 ships) plus card art from voidstate/xwing-card-images and the xwing-data images folder | master |
 | 2.0 | 200 points, pilot costs in the 40s | xwingtmg/xwing-data2 | tag xwing-2.0 (data version 2.5.3) |
-| 2.5 | 20 squad points, per-ship loadout value (Biggs 5 points, loadout 12) | xwing-data2 | tag 3.1.0, the first release on the new scale |
-| AMG 2.5 | 20 squad points, revised loadouts (Biggs loadout 18) | xwing-data2 | tag 3.6.3 |
-| XWA | 20 squad points, loadout points; rulebook v1.1.1, Rules Reference v1.4.6, Errata v1.8.2 | xwing-data2 latest plus errata printouts | tag 3.9.1 |
+| 2.5 / AMG | 20 squad points, per-ship loadout value; rulebook v1.1.1, Rules Reference v1.4.6, Errata v1.8.2, ship points 2024-09-06, upgrade points 2024-11-01 | xwing-data2 tag 3.9.1 for card text and art (its points predate the 2024 sheets); the points PDFs are the source of truth | 3.9.1 |
+| XWA | Rules not yet supplied | To be decided | 3.9.1 placeholder |
 
 Checked against the real tags: points on the 2.0 tag are on the old 200-point scale, and every 3.x tag is on the new 20-point scale with loadout values.
 
-The pinned tags are my best mapping of your five editions to data releases. Each is a dropdown in Settings (all 60 tags are listed), so you can repin an edition to the exact release you mean without code changes. Data loads at runtime from jsDelivr, for example `cdn.jsdelivr.net/gh/xwingtmg/xwing-data2@3.1.0/data/manifest.json`.
+The pinned tags are my best mapping of your four editions to data releases. Each is a dropdown in Settings (all 60 tags are listed), so you can repin an edition to the exact release you mean without code changes. Data loads at runtime from jsDelivr, for example `cdn.jsdelivr.net/gh/xwingtmg/xwing-data2@3.1.0/data/manifest.json`.
 
 ## 3. Architecture
 
@@ -46,7 +45,7 @@ The pinned tags are my best mapping of your five editions to data releases. Each
 
 - Browsers for ships, pilots, upgrades and conditions, by faction and slot.
 - Search and filters: name, ship, initiative, cost, slot, faction, unique, text.
-- Card detail with art, ability text, restrictions, and the cost under each of the five editions side by side.
+- Card detail with art, ability text, restrictions, and the cost under each of the four editions side by side.
 - "Owned" flags per ship and upgrade, plus an owned-only filter; optional inventory import.
 - Errata handling for XWA: flag cards covered by Errata v1.8.2 and link the printout.
 
@@ -100,3 +99,10 @@ Hosting: GitHub Pages from the `main` branch root gives ianmcgo.github.io/xwing.
 ## 11. Existing prototype (v0.2)
 
 The current `index.html` already contains the campaign trackers, an AI ship generator seeded from the HotAC spreadsheet, a basic 2E and 1E card browser, the HotAC 2.07.04 XP shop and mission tracker, and an XWA game tracker. M1 reuses its card loading and its tab and storage scaffolding.
+
+## 12. Update v0.3
+
+- Editions are now 1st Edition, 2.0, 2.5 / AMG (one edition) and XWA. The rules documents earlier labelled XWA were the 2.5 / AMG documents, so the tracker is relabelled and XWA has no rules yet.
+- New Rules tab: per edition, a document list with an in-page reader (browser PDF viewer) and download buttons for rulebook, rules reference, errata and points. 2.5 / AMG has all five documents hosted in `files/2.5/` (rules reference recompressed from 75 MB to 12 MB, text unchanged). 1E, 2.0 and XWA show what is still needed.
+- Card browser now loads the pinned data release per edition: 2.0 uses tag xwing-2.0, 2.5 / AMG and XWA use 3.9.1.
+- Next: parse the ship and upgrade points PDFs into data so the 2.5 / AMG builder uses the 2024 costs, loadout values, upgrade bars and legality columns.
