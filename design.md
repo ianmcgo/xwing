@@ -171,3 +171,5 @@ The page title and header now read X-Wing HotAC Cockpit.
 The top bar reads, left to right: the title, the edition drop down, then (pushed right) the Support on Patreon, My Website and Cabal Coffers links and the visitor log. There is no footer any more.
 
 The visitor log panel is hidden on screens up to 700px wide (phones); the globe and counting still run.
+
+The visitor files are loaded with a ?v= number; raise it whenever the files change so browsers do not keep an older copy.
