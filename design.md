@@ -133,3 +133,5 @@ The Upgrades button in the cockpit header opens a window of every upgrade the se
 Starting XP: new pilots start with 10 XP (HotAC 2.07 gives X-wing pilots 10). Change it with HC_STARTXP.
 
 Hero creation now asks for a starting ship: X-Wing (10 XP) or Y-Wing (16 XP) for The Old School, Eta-2 Actis or Delta-7 for The Force User (10 XP, unconfirmed).
+
+Pilots saved before the starting-XP change (0 XP, nothing bought) get their starting XP once when the cockpit first opens them.

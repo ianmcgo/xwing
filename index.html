@@ -254,6 +254,7 @@ return HC_MAP;
 }
 function ckNorm(p){
 if(!HC_SHIPS[p.ship])p.ship="X-Wing";
+if(!p.xpInit){p.xpInit=1;if(!(p.xp>0)&&!p.kills&&!Object.keys(p.deck||{}).length&&!Object.keys(p.owned||{}).length)p.xp=HC_STARTXP[p.ship]||10}
 if(!p.cls)p.cls="oldschool";
 if(!p.rank)p.rank=Math.min(5,Math.max(1,(p.ps||2)-1));
 p.ps=p.rank+1;
