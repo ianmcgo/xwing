@@ -79,3 +79,17 @@ Interpretation and limits:
 - Restrictions that exist only as card text (for example "Rebel only" without a data field) are not enforced, so some cards may appear for the wrong faction or ship. Epic and huge ship special rules, and dual-slot cards, are not enforced.
 - Data comes from xwing-data and stops at the last wave it covers.
 - Tested end to end in a headless browser: add pilot, equip, points, text export, XWS export, XWS import round trip.
+
+## 9. XWA squad builder (v0.7)
+
+Data comes from `scripts/parse_points.py`, which reads the Ship Points (2024-09-06) and Upgrade Points (2024-11-01) PDFs and writes `data/xwa_points.json` (embedded in index.html as `XWA`). Run it with the two PDFs, an output path and a checkout of xwing-data2 (used only for ship sizes).
+
+Rules enforced: squad point limit (default 20), 3 to 8 ships, one faction per squad, loadout value per ship, standard loadout ships take no upgrades, limited cards (bullets = copies allowed by name), upgrade bar slots (multi-type upgrades use one slot of each type), Standard or Extended legality, banned cards.
+
+Restrictions are free text in the PDF. A small evaluator handles factions, ship names, keywords, sizes and "squad including X". Anything with an icon glyph, "Standardized", or an unrecognised phrase is reported as "cannot check automatically" instead of being guessed.
+
+Known gaps: the PDFs do not separate Restricted from Banned, so Restricted cards are not flagged. Ship sizes are missing for the Upsilon-class and Xi-class shuttles. The XWA 50P points companion and ban lists have not been supplied. No card art in the XWA builder yet.
+
+## 10. 1st Edition official missions
+
+`E1_MISSIONS` lists the 17 missions in the Official Missions PDF (M1 to M9, Hoth H1 to H3, Point of No Return T1 to T4), transcribed from OCR of the scanned booklet and shortened. The PDF is in `files/1e/` and listed in the Rules tab. Won/lost is tracked in `S.offm`. The booklet has no solo rules.

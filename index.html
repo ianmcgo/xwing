@@ -480,7 +480,60 @@ return{c:c,d:d,f:f,msg:out.join("; ")};
 var TALLY_FIELDS=[["dmg","Damage dealt"],["kills","Kills"],["large","Large ship kills"],["nonf","Non-TIE-fighter kills"],["elite","Elite kills"],["assist","Assists"],["guardian","Guardian"],["bonus","Objective ± XP"]];
 function tallyFor(i){S.hotac=S.hotac||{done:{},cur:null,tally:{}};var t=S.hotac.tally[i];if(!t)t=S.hotac.tally[i]={dmg:0,kills:0,large:0,nonf:0,elite:0,assist:0,guardian:0,bonus:0,down:false};return t}
 function tallyXP(i){var t=tallyFor(i);return t.dmg+t.kills+t.large+t.nonf+t.assist+t.guardian+t.bonus}
+var E1_MISSIONS=[
+["Core and expansion missions","M1","Political Escort","Rebel: Red Squadron Pilot. Rebel shuttle (agility 2, hull 6) crawls forward each round.","Imperial: Academy Pilot x2, with reinforcements each End phase.","Shuttle flees off the Imperial edge.","Destroy the senator's shuttle."],
+["Core and expansion missions","M2","Asteroid Run","Rebel: Luke Skywalker (Determination). One ship is disabled (speed 1-2 only) until round 5.","Imperial: Night Beast, Mauler Mithel (Marksmanship), with reinforcements. Six asteroids.","The disabled ship flees the battlefield.","Destroy the disabled ship."],
+["Core and expansion missions","M3","Dark Whispers","Rebel: Red Squadron Pilot (Proton Torpedoes, R2-F2). Defends satellite tokens.","Imperial: Black Squadron Pilot (Determination), Obsidian Squadron Pilot.","Destroy all Imperial ships, or lock down the satellites in time.","Download all satellites."],
+["Core and expansion missions","M4","Den of Thieves","Rebel: 100 squad points. Smugglers ambush the shipment.","Imperial: 100 squad points. Two ships carry escort tokens.","Collect two container tokens.","Two containers flee off the Rebel edge; may win even if all ships are destroyed."],
+["Core and expansion missions","M5","Preystalker","Rebel: 150 squad points. One ship carries a bounty (cost doubled, two extra upgrade icons, upgrades cost 10 less); all Rebel ships start stressed.","Imperial: 90 squad points.","Destroy all Imperial ships.","Destroy the ship with the bounty."],
+["Core and expansion missions","M6","Undeniable Assets","Rebel: 100 squad points. Places three disabled-ship tokens and four passengers.","Imperial: 120 squad points.","Capture six passengers, or destroy all Imperial ships (disabled ships excluded).","Secure five passengers."],
+["Core and expansion missions","M7","Cutting the Cord","Rebel: 110 squad points; two operatives assigned to one ship.","Imperial: 100 squad points; one non-unique ship is the Prototype. Six asteroids, hidden facilities.","Destroy the prototype.","Destroy all Rebel ships."],
+["Core and expansion missions","M8","Rendezvous","Rebel: 3 GR-75s (Combat Retrofit), 200 squad points; each GR-75's upgrades cost 10 less.","Imperial: 250 squad points.","Two GR-75s flee at their matching hyperspace tokens.","Destroy two GR-75s."],
+["Core and expansion missions","M9","Jump to Subspace","Rebel: 100 squad points; must include an A-wing and a B-wing (one unique).","Imperial: 75 squad points; no large ships. Six asteroids placed alternately; escape pod token.","The escape pod flees off the Rebel edge.","Destroy all Rebel ships."],
+["Evacuation of Hoth campaign (H1, H2, H3 in order)","H1","Evacuation","Rebel: GR-75 (Combat Retrofit), 125 squad points.","Imperial: 100 squad points; six mine tokens with control tokens.","GR-75 flees the play area at the corner shared by both Imperial edges.","Destroy the GR-75."],
+["Evacuation of Hoth campaign (H1, H2, H3 in order)","H2","Blockade Run","Rebel: GR-75 (Combat Retrofit), 140 squad points.","Imperial: 200 squad points in four groups (A and C 45-55, B and D 25-35 points); turbolaser and ion blast crossfire tokens.","GR-75 survives after 8 rounds.","Destroy the GR-75."],
+["Evacuation of Hoth campaign (H1, H2, H3 in order)","H3","Asteroid Gauntlet","Rebel: GR-75 (Combat Retrofit), 125 squad points.","Imperial: 125 squad points; six core set asteroids.","GR-75 survives after 8 rounds.","Destroy the GR-75."],
+["The Point of No Return campaign (CR90)","T1","Mistaken Identity","Rebel: CR90. Play area 3x3 feet.","Imperial: Howlrunner (Determination), 5 Black Squadron Pilots.","Neither CR90 section is crippled after 6 rounds.","Cripple one CR90 section."],
+["The Point of No Return campaign (CR90)","T2A","Refueling Ambush","Rebel: CR90, 75 squad points; no unique ships or upgrades.","Imperial: Soontir Fel (Push the Limit), 3 Black Squadron Pilots, 75 squad points; at most one large ship.","CR90 flees off the Imperial edge, or destroy all Imperial ships.","Cripple one CR90 section."],
+["The Point of No Return campaign (CR90)","T2B","Emergency Repairs","Rebel: CR90, 75 squad points; exactly one unique ship.","Imperial: Captain Jonus (Squad Leader, Proton Bombs), 100 squad points.","CR90 flees off the neutral edge.","Cripple one CR90 section."],
+["The Point of No Return campaign (CR90)","T3A","Satellite Uplink","Rebel: CR90, Wedge Antilles (Proton Torpedoes, R2 Astromech), 100 squad points; no other unique ships or upgrades.","Imperial: Maarek Stele (Cluster Missiles, Marksmanship), 4 Black Squadron Pilots, 100 squad points.","Destroy all Imperial ships.","Destroy the CR90 or all satellites."],
+["The Point of No Return campaign (CR90)","T3B","Punch It!","Rebel: CR90, 80 squad points; one unique ship at most, no large ships or unique upgrades.","Imperial: Colonel Jendon (ST-321, Flight Instructor), Backstabber, Turr Phennir (Veteran Instincts); 150 squad points.","Hyperdrive card collects six hyperdrive tokens, or destroy all Imperial ships.","Cripple the CR90 section holding the hyperdrive card."],
+["The Point of No Return campaign (CR90)","T4","Minefield","Rebel: CR90, 100 squad points, one free upgrade per mission won.","Imperial: 240 squad points in four groups of 50-70 points.","CR90 flees off the Imperial edge.","Destroy the CR90."]
+];
+function viewMissions1(){
+S.offm=S.offm||{};
+var groups={};
+E1_MISSIONS.forEach(function(m){(groups[m[0]]=groups[m[0]]||[]).push(m)});
+var head=h("div",{class:"card"},[
+h("h2",{},"1st Edition official missions"),
+h("div",{class:"note"},"These come from the Official Missions booklet. Each mission is written for a Rebel player against an Imperial player. The booklet has no solo rules, so for single player you fly one side and drive the other with the AI of your choice. Squad points below are the 1st Edition mission values."),
+h("div",{class:"row"},[h("a",{class:"b",href:"files/1e/Official_Missions.pdf",target:"_blank",rel:"noopener"},"Open the Official Missions PDF"),h("a",{class:"b",href:"files/1e/Official_Missions.pdf",download:"Star_Wars_X-Wing_Official_Missions.pdf"},"Download")])
+]);
+var body=Object.keys(groups).map(function(g){
+return h("div",{class:"card"},[
+h("h3",{},g),
+h("div",{},groups[g].map(function(m){
+var st=S.offm[m[1]]||"";
+return h("details",{style:"margin:6px 0"},[
+h("summary",{},[h("b",{},m[1]+" "+m[2]),st?h("span",{class:st==="Won"?"ok":"bad"},"  "+st):null]),
+h("div",{style:"margin:6px 0"},[
+h("div",{},m[3]),h("div",{},m[4]),
+h("div",{},[h("b",{},"Rebel wins: "),m[5]]),
+h("div",{},[h("b",{},"Imperial wins: "),m[6]]),
+h("div",{class:"row",style:"margin-top:8px"},[
+btn("Won",function(){S.offm[m[1]]="Won";refresh()}),
+btn("Lost",function(){S.offm[m[1]]="Lost";refresh()}),
+btn("Clear",function(){delete S.offm[m[1]];refresh()})
+])
+])
+]);
+}))
+]);
+});
+return h("div",{},[head].concat(body));
+}
 function viewMissions(){
+if(S.edition==="1e")return viewMissions1();
 S.hotac=S.hotac||{done:{},cur:null,tally:{}};
 var H=S.hotac;
 if(S.module!=="hotac")return h("div",{class:"card"},"The mission list and XP tally are built for the Heroes of the Aturi Cluster module. Switch the campaign module on the Campaign tab.");
@@ -612,7 +665,9 @@ h("div",{class:"card"},[h("h2",{},"Edition note"),h("div",{class:"note"},S.editi
 }
 
 var DOCS={
-"1e":[],
+"1e":[
+{kind:"Missions",title:"Official Missions (campaigns: Evacuation of Hoth, Point of No Return)",ver:"",date:"",file:"files/1e/Official_Missions.pdf",pages:27}
+],
 "xwa":[
 {kind:"Rulebook",title:"Rulebook",ver:"v1.1.1",date:"2023-10-30",file:"files/xwa/Rulebook_v1.1.1_2023-10-30.pdf",pages:24},
 {kind:"Reference",title:"Rules Reference",ver:"v1.4.6",date:"2023-09-15",file:"files/xwa/Rules_Reference_v1.4.6_2023-09-15.pdf",pages:49},

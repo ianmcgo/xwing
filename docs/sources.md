@@ -21,3 +21,6 @@
 | 1stEdition.zip, CWCC-Entries.zip | uploaded | local | 1E book, community campaigns |
 | XWA Rulebook 1.1.1, Rules Reference 1.4.6, Errata 1.8.2 | uploaded | local | XWA rules |
 | Ship Points 2024-09-06, Upgrade Points 2024-11-01 | uploaded, hosted in files/2.5 | local | 2.5 / AMG points, loadouts, standard and extended legality |
+
+- files/1e/Official_Missions.pdf: Star Wars X-Wing Official Missions booklet (scan), supplied by the user.
+- data/xwa_points.json: generated from files/xwa/Ship_Points_2024-09-06.pdf and Upgrade_Points_2024-11-01.pdf.
