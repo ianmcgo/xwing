@@ -1244,6 +1244,7 @@ h("div",{class:"f"},field("Name",txt(sq.name,function(v){sq.name=v;refresh()})))
 h("div",{class:"f"},field("Faction",sel(Object.keys(E1_FX),sq.faction,function(v){if(v===sq.faction)return;if(sq.ships.length&&!confirm("Changing faction clears the squad. Continue?")){refresh();return}sq.faction=v;sq.ships=[];BLD.ship="";BLD.pilot="";refresh()}))),
 h("div",{style:"width:130px"},field("Point limit",txt(sq.limit,function(v){sq.limit=v;refresh()},"number")))
 ]),
+h("label",{style:"display:flex;gap:6px;align-items:center;text-transform:none;font-size:14px;color:var(--text);margin-top:8px"},[h("input",{type:"checkbox",checked:!!sq.ownOnly,onchange:function(e){sq.ownOnly=e.target.checked;refresh()}}),"Only cards from my expansions (set on the Database tab)"]),
 h("div",{class:"row",style:"margin-top:10px"},[
 h("div",{class:"big",style:pts>sq.limit?"color:var(--bad)":""},pts+" / "+sq.limit),
 h("span",{class:"dim"},sq.ships.length+" ship"+(sq.ships.length===1?"":"s"))
@@ -1270,10 +1271,10 @@ btn("Close",function(){BLD.out=null;render()})
 ])
 ]);
 }
-var ships=Array.from(new Set(E1_PILOTS.filter(function(r){return r[1]===sq.faction}).map(function(r){return r[2]}))).sort();
+var ships=Array.from(new Set(E1_PILOTS.filter(function(r,i){return r[1]===sq.faction&&(!sq.ownOnly||e1has(true,i))}).map(function(r){return r[2]}))).sort();
 if(ships.indexOf(BLD.ship)<0)BLD.ship=ships[0]||"";
 var pilots=[];
-E1_PILOTS.forEach(function(r,i){if(r[1]===sq.faction&&r[2]===BLD.ship)pilots.push(i)});
+E1_PILOTS.forEach(function(r,i){if(r[1]===sq.faction&&r[2]===BLD.ship&&(!sq.ownOnly||e1has(true,i)))pilots.push(i)});
 pilots.sort(function(a,b){return E1_PILOTS[b][3]-E1_PILOTS[a][3]||E1_PILOTS[a][0].localeCompare(E1_PILOTS[b][0])});
 if(pilots.indexOf(Number(BLD.pilot))<0)BLD.pilot=String(pilots[0]);
 var addp=h("div",{class:"card"},[
@@ -1304,6 +1305,7 @@ var cur=sh.up[k.key];
 var opts=[["","— empty —"]];
 E1_UPGRADES.forEach(function(u,idx){
 if(u[1]!==k.type)return;
+if(sq.ownOnly&&idx!==cur&&!e1has(false,idx))return;
 if(idx===cur||upgradeOK(sq,sh,idx,k.key))opts.push([String(idx),(u[7]?"• ":"")+u[0]+" ("+u[2]+")"]);
 });
 opts.sort(function(a,b){return a[0]===""?-1:b[0]===""?1:a[1].localeCompare(b[1])});
