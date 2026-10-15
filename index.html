@@ -234,7 +234,7 @@ var HC_RANKCOST=[0,0,9,12,15,18];
 var HC_SHIPCOST=5;
 var HC_MAP=null;
 var GOLD="https://raw.githubusercontent.com/CrazyVulcan/x-wing2.0-project-goldenrod/main/src/images/";
-var CK={tab:"hand",q:"",slot:"All",pick:null,create:null};
+var CK={tab:"hand",q:"",slot:"All",pick:null,create:null,modal:false,mq:"",mslot:"All",mall:false,mlim:60};
 function hcMap(){
 if(HC_MAP)return HC_MAP;
 HC_MAP={};
@@ -291,7 +291,8 @@ var slots=ckSlots(p);
 var target=null;
 if(key)target=slots.filter(function(s){return s.key===key})[0];
 else target=slots.filter(function(s){return!p.load[p.ship][s.key]&&s.types.indexOf(c.slots[0])>=0})[0];
-if(!target||target.types.indexOf(c.slots[0])<0){alert("No free "+c.slots[0]+" slot on this ship");return}
+if(!target&&!key)target=slots.filter(function(s){return s.types.indexOf(c.slots[0])>=0})[0];
+if(!target||target.types.indexOf(c.slots[0])<0){alert("This ship has no "+c.slots[0]+" slot");return}
 Object.keys(p.load[p.ship]).forEach(function(k){if(p.load[p.ship][k]===name)delete p.load[p.ship][k]});
 p.load[p.ship][target.key]=name;
 CK.pick=null;
@@ -322,6 +323,62 @@ S.players.push(p);S.ck=S.players.length-1;CK.create=null;log("Pilot created: "+p
 },"p")
 ]);
 }
+function ckStatus(c,p,slots){
+var ok=slots.some(function(s){return s.types.indexOf(c.slots[0])>=0});
+if(!ok){
+var later=(c.slots[0]==="Ace"||c.slots[0]==="Talent"||c.slots[0]==="Force Power")&&p.rank<2;
+if(later)return"Needs the Ace, Talent or Force slot from rank 2";
+var has=Object.keys(HC_SHIPS).filter(function(n){return HC_SHIPS[n].bar.indexOf(c.slots[0])>=0});
+return"No "+c.slots[0]+" slot on the "+p.ship+(has.length?". Ships with one: "+has.join(", "):"")}
+if(!ckFits(c,p))return"Restricted to other ships or sizes";
+if(c.level&&p.ps<c.level)return"Needs initiative "+c.level;
+return"";
+}
+function ckModal(p,slots,load){
+var q=CK.mq.toLowerCase();
+var all=Object.keys(hcMap());
+var rows=all.filter(function(n){
+var c=hcMap()[n];
+var st=ckStatus(c,p,slots);
+if(!CK.mall&&st)return false;
+if(CK.mslot!=="All"&&c.slots.indexOf(CK.mslot)<0)return false;
+return!q||(c.name+" "+c.text).toLowerCase().indexOf(q)>=0;
+}).sort(function(a,b){var A=hcMap()[a],B=hcMap()[b];return A.slots[0].localeCompare(B.slots[0])||a.localeCompare(b)});
+var shown=rows.slice(0,CK.mlim);
+var types=["All"].concat(Array.from(new Set(all.reduce(function(a,n){return a.concat(hcMap()[n].slots)},[]))).sort());
+var hand=slots.map(function(s){return load[s.key]}).filter(Boolean);
+var list=shown.map(function(n){
+var c=hcMap()[n],st=ckStatus(c,p,slots),owned=!!p.deck[n],price=ckPrice(c);
+var acts=[];
+if(!owned){
+var can=(p.xp||0)>=price;
+acts.push(btn("Buy ⚡ "+price,function(){if(!can){alert("Not enough XP");return}p.xp-=price;p.deck[n]=1;log(p.name+" bought "+n+" ("+price+" XP)");refresh()},can?"p":""));
+}else{
+acts.push(h("span",{class:"ok"},"Owned"));
+if(!st)acts.push(btn(hand.indexOf(n)>=0?"Installed":"Install",function(){ckEquip(p,n,null)},hand.indexOf(n)>=0?"p":""));
+}
+var view=ckCardView(c,acts);
+if(st)view.querySelector(".f").appendChild(h("div",{class:"dim",style:"font-size:12px;color:var(--bad)"},"Can't use yet: "+st));
+return view;
+});
+return h("div",{style:"position:fixed;inset:0;z-index:50;background:rgba(5,8,14,.85);overflow:auto;padding:16px"},[
+h("div",{class:"card",style:"max-width:900px;margin:0 auto;background:var(--panel)"},[
+h("div",{class:"row",style:"align-items:center"},[
+h("h2",{class:"f"},"Upgrades for the "+p.ship),
+h("span",{style:"color:#f4c430;font-size:18px"},"⚡ "+(p.xp||0)),
+btn("Close",function(){CK.modal=false;render()},"p")
+]),
+h("div",{class:"row",style:"margin-top:8px"},[
+h("div",{class:"f"},field("Search",txt(CK.mq,function(v){CK.mq=v;CK.mlim=60;render()}))),
+h("div",{},field("Slot",sel(types,CK.mslot,function(v){CK.mslot=v;CK.mlim=60;render()}))),
+h("label",{style:"display:flex;gap:6px;align-items:center;text-transform:none;font-size:14px;color:var(--text)"},[h("input",{type:"checkbox",checked:CK.mall,onchange:function(e){CK.mall=e.target.checked;CK.mlim=60;render()}}),"Show every upgrade, even ones this ship can't use yet"])
+]),
+h("div",{class:"dim",style:"margin:6px 0"},rows.length+" upgrades. Buy any of them; you can only install ones that fit a free or replaceable slot on the selected ship."),
+h("div",{},list),
+rows.length>shown.length?btn("Show more",function(){CK.mlim+=60;render()}):null
+])
+]);
+}
 function viewCockpit(){
 if(CK.create)return ckCreate();
 if(!S.players.length)return viewLanding();
@@ -336,6 +393,7 @@ h("b",{style:"font-size:18px"},cls.name),
 h("span",{style:"color:#f4c430;font-size:18px"},"⚡ "+(p.xp||0)),
 h("div",{class:"f"}),
 h("div",{},sel(S.players.map(function(x,i){return[String(i),x.name||"Pilot "+(i+1)]}),String(S.ck),function(v){S.ck=Number(v);CK.pick=null;refresh()})),
+btn("Upgrades",function(){CK.modal=true;CK.mlim=60;render()},"p"),
 btn("Add XP",function(){var v=prompt("XP to add (negative to remove)","1");if(v===null)return;var n=Number(v);if(isNaN(n))return;p.xp=Math.max(0,(p.xp||0)+n);log(p.name+": "+(n>=0?"+":"")+n+" XP");refresh()}),
 btn("New pilot",function(){CK.create={name:"",cls:"oldschool"};render()},"p")
 ]),
@@ -430,7 +488,7 @@ CK.pick?h("div",{class:"note"},"Choosing for slot "+CK.pick.replace(/#.*/,"")+".
 ]),
 h("div",{},listing)
 ]);
-return h("div",{},[head,h("div",{class:"grid",style:"grid-template-columns:minmax(300px,1fr) minmax(300px,1fr);align-items:start;margin-top:12px"},[h("div",{},[loadout,ships,rank]),right]),
+return h("div",{},[CK.modal?ckModal(p,slots,load):null,head,h("div",{class:"grid",style:"grid-template-columns:minmax(300px,1fr) minmax(300px,1fr);align-items:start;margin-top:12px"},[h("div",{},[loadout,ships,rank]),right]),
 btn("Classic pilot sheet",function(){S.classic=true;refresh()}),
 h("div",{class:"dim",style:"margin-top:10px;font-size:12px"},"Prices default to the card costs in the card data and the HotAC 2.07 pilot ability list. Change any price in the Store if your table uses different values.")]);
 }

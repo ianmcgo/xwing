@@ -125,3 +125,7 @@ CrazyVulcan/x-wing2.0-project-goldenrod holds images only (no card text): full c
 ## 16. Starfield
 
 A fixed canvas behind the page draws drifting, twinkling stars that also shift slightly as you scroll. Cards and the header sit above it. It stays still when the system asks for reduced motion and is hidden when printing.
+
+## 17. Upgrades window
+
+The Upgrades button in the cockpit header opens a window of every upgrade the selected ship can use, with Buy and Install. A checkbox shows every upgrade, including ones this ship cannot use yet (wrong slot, other ship, rank or initiative too low) with the reason; those can still be bought and installed later. Installing into a full slot replaces the card there.
