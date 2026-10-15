@@ -203,7 +203,7 @@ h("h2",{},"Squadron"),
 h("div",{class:"big"},S.players.length+" pilot"+(S.players.length===1?"":"s")),
 h("div",{class:"dim"},"Total XP held: "+S.players.reduce(function(s,p){return s+p.xp},0)+"  ·  Pool: "+S.pool),
 h("div",{class:"row",style:"margin-top:10px"},[
-btn("Add pilot",function(){if(S.players.length>=4&&!confirm("More than 4 pilots. Add anyway?"))return;CK.create={name:"",cls:"oldschool"};S.tab="pilots";refresh()},"p"),
+btn("Add pilot",function(){if(S.players.length>=4&&!confirm("More than 4 pilots. Add anyway?"))return;CK.create={name:"",cls:null};S.tab="pilots";refresh()},"p"),
 
 S.module==="pallas"?btn("Add pilot with starting XP…",function(){
 var n=prompt("Ship ("+PALLAS_START.map(function(x){return x[0]}).join(", ")+")");
@@ -227,7 +227,7 @@ h("p",{},"The Empire outnumbers us greatly here, with a planetary garrison on Nu
 h("p",{},"Perhaps you will become the heroes the Rebellion desperately needs.")
 ]),
 h("div",{class:"row",style:"justify-content:center"},[
-btn("Create new pilot",function(){S.introSeen=true;CK.create={name:"",cls:"oldschool"};render()},"p")
+btn("Create new pilot",function(){S.introSeen=true;CK.create={name:"",cls:null};render()},"p")
 ]),
 h("div",{class:"dim",style:"margin-top:14px;font-size:13px"},"Built on the work of Josh Derksen (creator of HotAC), Infinite Arenas, and Dovi Anderson (base classes and card edits). Unofficial fan tool, not affiliated with or endorsed by Fantasy Flight Games or Atomic Mass Games.")
 ]);
@@ -331,36 +331,37 @@ refresh();
 }
 function ckCreate(){
 var C=CK.create;
-var cls=HC_CLASSES.filter(function(c){return c.id===C.cls})[0];
+var cls=HC_CLASSES.filter(function(c){return c.id===C.cls})[0]||null;
 return h("div",{class:"card",style:"max-width:820px;margin:0 auto"},[
 h("div",{class:"row"},[h("h2",{class:"f"},"Create new pilot"),btn("Cancel",function(){CK.create=null;render()})]),
 h("div",{class:"dim"},"Configure your pilot's identity, class and starting ship"),
 h("div",{style:"max-width:320px;margin:10px 0"},field("Callsign",txt(C.name,function(v){C.name=v}))),
 h("div",{class:"grid g3"},HC_CLASSES.map(function(c){
 var on=c.id===C.cls;
-return h("div",{class:"card",style:"cursor:pointer;"+(on?"border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)":""),onclick:function(){C.cls=c.id;C.ship=c.start;render()}},[
+return h("div",{class:"card",style:"cursor:pointer;"+(on?"border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)":""),onclick:function(){if(C.cls!==c.id){C.cls=c.id;C.ship=null}render()}},[
 h("h3",{},c.name+(on?" ✔":"")),
 h("div",{style:"font-size:13px"},c.desc),
 h("div",{class:"dim",style:"margin-top:6px"},"Starts in: "+c.start),
 h("div",{class:"dim"},"Additional ships: "+c.more.join(", "))
 ]);
 })),
-h("div",{style:"margin:12px 0"},[
-h("h3",{},"Starting ship"),
+cls?h("div",{style:"margin:12px 0"},[
+h("h3",{},"Choose your starting ship"),
 h("div",{class:"grid g3"},cls.starts.map(function(n){
-var on=(C.ship||cls.start)===n;
+var on=C.ship===n;
 return h("div",{class:"card",style:"cursor:pointer;"+(on?"background:#a35f0a;border-color:#f4c430":""),onclick:function(){C.ship=n;render()}},[
 h("b",{},n+(on?" ✔":"")),
 h("div",{style:"margin:6px 0"},HC_SHIPS[n].bar.map(ckBadge)),
 h("div",{class:"dim"},"Starts with "+(HC_STARTXP[n]||10)+" XP")
 ]);
 }))
-]),
+]):h("div",{class:"dim",style:"margin:12px 0"},"Pick a class to see its starting ships."),
 h("div",{class:"note"},"Only two classes are entered so far. Send the other class names, descriptions and ships and they will be added."),
 btn("Create pilot",function(){
+if(!cls||!C.ship){alert("Pick a class and a starting ship first");return}
 var p=newPlayer();
 p.name=C.name||"Pilot "+(S.players.length+1);
-var ship=C.ship&&cls.starts.indexOf(C.ship)>=0?C.ship:cls.start;
+var ship=C.ship;
 p.cls=cls.id;p.ship=ship;p.rank=1;p.ps=2;p.xp=HC_STARTXP[ship]||10;p.owned={};p.owned[ship]=1;
 S.players.push(p);S.ck=S.players.length-1;CK.create=null;log("Pilot created: "+p.name+" ("+cls.name+")");refresh();
 },"p")
@@ -438,7 +439,7 @@ h("div",{class:"f"}),
 h("div",{},sel(S.players.map(function(x,i){return[String(i),x.name||"Pilot "+(i+1)]}),String(S.ck),function(v){S.ck=Number(v);CK.pick=null;refresh()})),
 btn("Upgrades",function(){CK.modal=true;CK.mlim=60;render()},"p"),
 btn("Add XP",function(){var v=prompt("XP to add (negative to remove)","1");if(v===null)return;var n=Number(v);if(isNaN(n))return;p.xp=Math.max(0,(p.xp||0)+n);log(p.name+": "+(n>=0?"+":"")+n+" XP");refresh()}),
-btn("New pilot",function(){CK.create={name:"",cls:"oldschool"};render()},"p")
+btn("New pilot",function(){CK.create={name:"",cls:null};render()},"p")
 ]),
 h("div",{class:"row",style:"margin-top:8px"},[
 h("div",{style:"width:220px"},field("Callsign",txt(p.name,function(v){p.name=v;refresh()}))),

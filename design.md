@@ -175,3 +175,7 @@ The visitor log panel is hidden on screens up to 700px wide (phones); the globe 
 The visitor files are loaded with a ?v= number; raise it whenever the files change so browsers do not keep an older copy.
 
 In the top bar the visitor log is a compact strip (the open-map footer line is hidden); clicking it still opens the globe.
+
+## 25. Pilot creation order
+
+The Create new pilot screen starts with no class selected. Choosing The Old School or The Force User then shows that class's starting ships, and the pilot can only be created once a class and one of those ships are picked.
