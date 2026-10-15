@@ -235,12 +235,12 @@ var HC_SHIPS={
 "Delta-7":{xws:"delta7aethersprite",size:"small",cls:"Jedi",bar:["Talent","Ace","Modification"]}
 };
 var HC_CLASSES=[
-{id:"oldschool",name:"The Old School",desc:"A traditional Rebel pilot who starts in an X-Wing and buys more ships as they rank up.",start:"X-Wing",more:["Y-Wing","A-Wing","B-Wing","HWK-290"]},
-{id:"force",name:"The Force User",desc:"A pilot who has trained in the ways of the Force, using their abilities to enhance their piloting.",start:"Eta-2 Actis",more:["Eta-2 Actis","Delta-7"]}
+{id:"oldschool",name:"The Old School",desc:"A traditional Rebel pilot who starts in an X-Wing and buys more ships as they rank up.",start:"X-Wing",starts:["X-Wing","Y-Wing"],more:["Y-Wing","A-Wing","B-Wing","HWK-290"]},
+{id:"force",name:"The Force User",desc:"A pilot who has trained in the ways of the Force, using their abilities to enhance their piloting.",start:"Eta-2 Actis",starts:["Eta-2 Actis","Delta-7"],more:["Eta-2 Actis","Delta-7"]}
 ];
 var HC_RANKCOST=[0,0,9,12,15,18];
 var HC_SHIPCOST=5;
-var HC_STARTXP=10;
+var HC_STARTXP={"X-Wing":10,"Y-Wing":16};
 var HC_MAP=null;
 var GOLD="https://raw.githubusercontent.com/CrazyVulcan/x-wing2.0-project-goldenrod/main/src/images/";
 var CK={tab:"hand",q:"",slot:"All",pick:null,create:null,modal:false,mq:"",mslot:"All",mall:false,mlim:60};
@@ -316,18 +316,26 @@ h("div",{class:"dim"},"Configure your pilot's identity, class and starting ship"
 h("div",{style:"max-width:320px;margin:10px 0"},field("Callsign",txt(C.name,function(v){C.name=v}))),
 h("div",{class:"grid g3"},HC_CLASSES.map(function(c){
 var on=c.id===C.cls;
-return h("div",{class:"card",style:"cursor:pointer;"+(on?"border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)":""),onclick:function(){C.cls=c.id;render()}},[
+return h("div",{class:"card",style:"cursor:pointer;"+(on?"border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)":""),onclick:function(){C.cls=c.id;C.ship=c.start;render()}},[
 h("h3",{},c.name+(on?" ✔":"")),
 h("div",{style:"font-size:13px"},c.desc),
 h("div",{class:"dim",style:"margin-top:6px"},"Starts in: "+c.start),
 h("div",{class:"dim"},"Additional ships: "+c.more.join(", "))
 ]);
 })),
+h("div",{style:"margin:12px 0"},[
+h("h3",{},"Starting ship"),
+h("div",{class:"row"},cls.starts.map(function(n){
+var on=(C.ship||cls.start)===n;
+return btn(n+" · "+(HC_STARTXP[n]||10)+" XP to start",function(){C.ship=n;render()},on?"p":"");
+}))
+]),
 h("div",{class:"note"},"Only two classes are entered so far. Send the other class names, descriptions and ships and they will be added."),
 btn("Create pilot",function(){
 var p=newPlayer();
 p.name=C.name||"Pilot "+(S.players.length+1);
-p.cls=cls.id;p.ship=cls.start;p.rank=1;p.ps=2;p.xp=HC_STARTXP;p.owned={};p.owned[cls.start]=1;
+var ship=C.ship&&cls.starts.indexOf(C.ship)>=0?C.ship:cls.start;
+p.cls=cls.id;p.ship=ship;p.rank=1;p.ps=2;p.xp=HC_STARTXP[ship]||10;p.owned={};p.owned[ship]=1;
 S.players.push(p);S.ck=S.players.length-1;CK.create=null;log("Pilot created: "+p.name+" ("+cls.name+")");refresh();
 },"p")
 ]);

@@ -131,3 +131,5 @@ A fixed canvas behind the page draws drifting, twinkling stars that also shift s
 The Upgrades button in the cockpit header opens a window of every upgrade the selected ship can use, with Buy and Install. A checkbox shows every upgrade, including ones this ship cannot use yet (wrong slot, other ship, rank or initiative too low) with the reason; those can still be bought and installed later. Installing into a full slot replaces the card there.
 
 Starting XP: new pilots start with 10 XP (HotAC 2.07 gives X-wing pilots 10). Change it with HC_STARTXP.
+
+Hero creation now asks for a starting ship: X-Wing (10 XP) or Y-Wing (16 XP) for The Old School, Eta-2 Actis or Delta-7 for The Force User (10 XP, unconfirmed).
