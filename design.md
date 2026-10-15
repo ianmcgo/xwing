@@ -109,3 +109,11 @@ Campaign library: Defenders of the Empire, Flight Group Alpha (with card pack an
 ## 13. Navigation
 
 Main tabs are the hero and campaign tools: Pilots (the hero builder, now the default), Campaign, Hangar, AI Ships and Missions. A Tools button opens a second row with Squad Builder (standard play), Database, Rules and Books, Rules / Play and Settings. Saved sessions that opened on the builder move to Pilots once.
+
+## 14. Pilot cockpit (replaces the pilot sheet)
+
+Modelled on screenshots of the former xwingunlimited.com. The Pilots tab is now a cockpit: class and XP header, callsign selector, Loadout (slots of the selected ship plus rank slots), Ships (buy for 5 XP from rank 2), Rank 1 to 5 (cost 9, 12, 15, 18 XP, initiative rank plus 1), and a Hand / Deck / Store panel with search and slot filter. The older sheet is still available through "Classic pilot sheet".
+
+Data: `data/hotac_catalog.json` (304 Rebel-usable upgrades from xwing-data2, built by `scripts/build_hotac_data.py`) and `data/hotac_aces.json` (48 pilot ability cards, OCR of Dovi Anderson's Alternate Pilot Abilities PDF merged with names, XP and associated pilots from the HotAC 2nd Edition Ship and Ability Points List). Text from OCR may contain icon garbage; check it against the PDF in Rules and Books.
+
+Known gaps: only two classes are entered (The Old School, The Force User); the other classes, their ships and their rank grants are unknown. Ship slot bars for A-Wing, B-Wing, HWK-290, Eta-2 Actis and Delta-7 are guesses from xwing-data2 and the screenshots. Store prices are card cost values and the HotAC ability list; the original site showed different numbers for some cards, so every price is editable. Cards that use more than one slot occupy only their first slot.
