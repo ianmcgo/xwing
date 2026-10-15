@@ -163,3 +163,5 @@ The Store tab and the upgrades window list only cards the pilot can afford and c
 ## 23. Tab icon
 
 The browser tab icon is an inline SVG data link in the page head: a dark disc with a goldenrod ring, four wing strokes in an X with cyan engine tips and a red cockpit light. It is an original design, so it needs no extra file.
+
+The page title and header now read X-Wing HotAC Cockpit.
