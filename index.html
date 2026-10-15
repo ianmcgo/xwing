@@ -272,7 +272,7 @@ var HC_CLASSES=[
 {id:"resistance",name:"The Resistance",desc:"A fighter pilot of the Resistance, flying the newest generation of Rebel starfighters.",start:"T-70 X-Wing",starts:["T-70 X-Wing","RZ-2 A-Wing"],more:["RZ-2 A-Wing"],fan:true},
 {id:"firstorder",name:"The First Order",desc:"An elite trainee of the First Order who climbs from TIE fighters toward the Silencer.",start:"TIE/fo Fighter",starts:["TIE/fo Fighter","TIE/sf Fighter"],more:["TIE/sf Fighter","TIE/vn Silencer"],fan:true},
 {id:"empire",name:"The Empire",desc:"An Imperial TIE pilot in the Flight Group Alpha style, starting in a TIE fighter, bomber or interceptor and working up to the advanced TIE designs.",start:"TIE/ln Fighter",starts:["TIE/ln Fighter","TIE/sa Bomber","TIE/in Interceptor"],more:["TIE/sa Bomber","TIE/in Interceptor","TIE Advanced x1","Alpha-class Star Wing","TIE/D Defender"],fan:true},
-{id:"separatist",name:"Separatists",desc:"A droid commander or corporate officer of the Separatist Alliance, fighting with swarm tactics and networked droid fighters.",start:"Vulture Droid",starts:["Vulture Droid","Droid Tri-Fighter","Hyena Droid Bomber","Belbullab-22","Nantex"],more:["Droid Tri-Fighter","Hyena Droid Bomber","Belbullab-22","Nantex"],fan:true},
+{id:"separatist",name:"Separatists",desc:"A droid commander or corporate officer of the Separatist Alliance, fighting with swarm tactics and networked droid fighters.",start:"Vulture Droid",starts:["Vulture Droid","Droid Tri-Fighter","Hyena Droid Bomber","Nantex"],more:["Belbullab-22"],fan:true},
 {id:"republic",name:"The Galactic Republic",desc:"A clone-war era pilot of the Republic navy, flying Torrents, ARC-170s and Jedi starfighters.",start:"V-19 Torrent",starts:["V-19 Torrent","ARC-170","Delta-7"],more:["N-1 Starfighter","Eta-2 Actis"],fan:true}
 ];
 var HC_RANKCOST=[0,0,9,12,15,18];
@@ -282,9 +282,9 @@ function hcInit(p,r){return r+(p.exp==="plotac"?0:1)}
 function hcExpOptions(cls){return cls&&cls.id==="scum"?["hotac","plotac"]:["hotac"]}
 var HC_SHIPCOST=5;
 var HC_STARTXP={"X-Wing":10,"Y-Wing":16,"TIE/ln Fighter":15,"TIE/sa Bomber":10,"TIE/in Interceptor":5};
-var HC_CLSXP={"republic:V-19 Torrent":15,"republic:ARC-170":8,"republic:Delta-7":3};
+var HC_CLSXP={"separatist:Vulture Droid":18,"separatist:Droid Tri-Fighter":12,"separatist:Hyena Droid Bomber":10,"separatist:Nantex":5,"republic:V-19 Torrent":15,"republic:ARC-170":8,"republic:Delta-7":3};
 function startXp(cid,ship){var k=cid+":"+ship;return HC_CLSXP[k]!=null?HC_CLSXP[k]:(HC_STARTXP[ship]||10)}
-var HC_UNLOCK={"republic:N-1 Starfighter":{rank:2,cost:8},"republic:Eta-2 Actis":{rank:3,cost:10},"empire:TIE Advanced x1":{rank:2,cost:8},"empire:Alpha-class Star Wing":{rank:3,cost:10},"empire:TIE/D Defender":{rank:4,cost:14}};
+var HC_UNLOCK={"separatist:Belbullab-22":{rank:2,cost:8},"republic:N-1 Starfighter":{rank:2,cost:8},"republic:Eta-2 Actis":{rank:3,cost:10},"empire:TIE Advanced x1":{rank:2,cost:8},"empire:Alpha-class Star Wing":{rank:3,cost:10},"empire:TIE/D Defender":{rank:4,cost:14}};
 function shipUnlock(p,n){return HC_UNLOCK[p.cls+":"+n]||null}
 function shipRank(p,n){var u=shipUnlock(p,n);return u?u.rank:2}
 function shipCost(p,n){var u=shipUnlock(p,n);return u?u.cost:HC_SHIPCOST}

@@ -238,3 +238,7 @@ Every other ship keeps the standard rule of rank 2 and 5 XP. The slot bars come 
 The Galactic Republic class now starts in the V-19 Torrent (15 XP), ARC-170 (8 XP) or Delta-7 Aethersprite (3 XP), values supplied by the user. Later unlocks are estimates kept in `HC_UNLOCK`, which is now keyed by class: the N-1 Starfighter at rank 2 (initiative 3) for 8 XP and the Eta-2 Actis at rank 3 (initiative 4) for 10 XP. The card data has only the Naboo Royal N-1 Starfighter, so that ship stands in for the N-1; a separate Naboo Royal Guard chassis was not added. Starting XP is now looked up by class and ship, so the same ship can start with different XP in different classes.
 
 The Force User class was removed because the Republic covers it. Pilots saved as Force Users become Republic pilots automatically when the page loads.
+
+## 34. Separatists update
+
+Separatists now start in the Vulture-class Droid Fighter (18 XP), Droid Tri-Fighter (12 XP), Hyena Droid Bomber (10 XP) or Nantex-class Fighter (5 XP), values supplied by the user. The Belbullab-22 is a later unlock at initiative 3 or more; the user gave no cost, so it is an estimate of rank 2 and 8 XP in `HC_UNLOCK`, shown as "(estimate)".
