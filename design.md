@@ -106,3 +106,10 @@ The current `index.html` already contains the campaign trackers, an AI ship gene
 - New Rules tab: per edition, a document list with an in-page reader (browser PDF viewer) and download buttons for rulebook, rules reference, errata and points. 2.5 / AMG has all five documents hosted in `files/2.5/` (rules reference recompressed from 75 MB to 12 MB, text unchanged). 1E, 2.0 and XWA show what is still needed.
 - Card browser now loads the pinned data release per edition: 2.0 uses tag xwing-2.0, 2.5 / AMG and XWA use 3.9.1.
 - Next: parse the ship and upgrade points PDFs into data so the 2.5 / AMG builder uses the 2024 costs, loadout values, upgrade bars and legality columns.
+
+## 13. Update v0.4
+
+- 1st Edition database: all 297 pilots and 367 upgrades from guidokessels/xwing-data are embedded in `index.html`, so the list no longer depends on a live file-listing API. Card art loads from raw.githubusercontent.com. Filters by faction, ship or slot, text search, owned flags, paging.
+- The previous 1E tab depended on the jsDelivr file-listing API, which I could not reach from my environment and had only tested against a stub. That is the likely reason the cards did not show.
+- Database is now the default tab.
+- Still not built: the squad builder.
