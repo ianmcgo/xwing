@@ -148,7 +148,7 @@ A footer under every page links to Patreon (https://www.patreon.com/cw/ianmcg, s
 
 ## 20. Visitor log
 
-The visitor log panel and the Visitor Origins globe are the same module that runs on the main website (https://ianmcgo.github.io/website/). They count into the same Supabase project as the website, so X-Wing visits are added to the website's totals and appear on its globe. The module is in `visitors/visitors.js` and `visitors/visitors.css`; the panel and globe markup sit at the end of `index.html`. It is configured by `window.VisitorTrackerConfig` (client, storage prefix `xwingcockpit`, and the text on the share card). The panel color follows the `--sc` variable, set to goldenrod. A browser counts once per UTC day. The earlier `xwing_visits` table in the FreeSpace 4X project was removed.
+The visitor log panel and the Visitor Origins globe are the same module that runs on the main website (https://ianmcgo.github.io/website/). They count into the same Supabase project as the website, so X-Wing visits are added to the website's totals and appear on its globe. The module is in `visitors/visitors.js` and `visitors/visitors.css`; the panel and globe markup sit at the end of `index.html`. It is configured by `window.VisitorTrackerConfig` (client, storage prefix `xwingcockpit`, and the text on the share card). The panel color follows the `--sc` variable, set to goldenrod. A browser counts once per UTC day. The earlier `xwing_visits` table and its two functions in the FreeSpace 4X project are no longer used and can be dropped.
 
 ## 21. Card zoom
 
