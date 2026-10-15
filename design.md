@@ -135,3 +135,9 @@ Starting XP: new pilots start with 10 XP (HotAC 2.07 gives X-wing pilots 10). Ch
 Hero creation now asks for a starting ship: X-Wing (10 XP) or Y-Wing (16 XP) for The Old School, Eta-2 Actis or Delta-7 for The Force User (10 XP, unconfirmed).
 
 Pilots saved before the starting-XP change (0 XP, nothing bought) get their starting XP once when the cockpit first opens them.
+
+## 18. XWA card database with pictures
+
+`data/cards2.json` (built by `scripts/build_cards2.py` from xwing-data2) holds all 672 pilots, 524 upgrades and 89 ships with text, cost, loadout, slots and legality. The XWA Database tab loads it from the site itself (no CDN), so it no longer depends on jsDelivr. Cards show the full card image from project-goldenrod (`En/<kind>/<xws>.png`), then the cropped art, then the same names without the expansion suffix, then the original xwing-data2 image. Some of the newest cards are not in the goldenrod repo and rely on that last fallback. The points tables from the PDFs stay under "Points: upgrades" and "Points: pilots".
+
+The cockpit Store and Upgrades window use the same fallback chain, starting with the cropped art. The first version only tried the exact xws name, which failed for cards with expansion suffixes such as "-battleofyavin".

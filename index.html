@@ -248,7 +248,7 @@ var CK={tab:"hand",q:"",slot:"All",pick:null,create:null,modal:false,mq:"",mslot
 function hcMap(){
 if(HC_MAP)return HC_MAP;
 HC_MAP={};
-HC_CARDS.forEach(function(c){HC_MAP[c[0]]={name:c[0],slots:c[1],cost:c[2],text:c[3],ships:c[4],sizes:c[5],other:c[6],image:c[9]?GOLD+"Art/upgrades/"+c[9]+".jpg":"",kind:"card"}});
+HC_CARDS.forEach(function(c){HC_MAP[c[0]]={name:c[0],slots:c[1],cost:c[2],text:c[3],ships:c[4],sizes:c[5],other:c[6],xws:c[9],fb:c[7],kind:"card"}});
 HC_ACES.forEach(function(a){HC_MAP[a[0]]={name:a[0],slots:["Ace"],cost:a[2],text:a[3],level:a[1],pilot:a[4],ships:[],sizes:[],other:"",image:"",kind:"ace"}});
 return HC_MAP;
 }
@@ -286,7 +286,7 @@ return h("span",{class:"tag",style:"padding:2px 6px;font-size:11px",title:t},m[t
 }
 function ckCardView(c,actions){
 return h("div",{class:"card",style:"display:flex;gap:10px"},[
-c.image?h("img",{src:c.image,alt:"",loading:"lazy",style:"width:72px;height:72px;object-fit:cover;border-radius:6px",onerror:function(e){e.target.style.display="none"}}):null,
+c.xws?cardImg("upgrades",c.xws,c.fb,false,"width:72px;height:72px;object-fit:cover;border-radius:6px",""):null,
 h("div",{class:"f"},[
 h("div",{class:"row"},[h("b",{class:"f"},c.name),h("span",{class:"dim"},"XP "+ckPrice(c))]),
 h("div",{style:"margin:4px 0"},c.slots.map(ckBadge).concat(c.level?[h("span",{class:"dim"}," Initiative "+c.level+"+")]:[],c.pilot?[h("span",{class:"dim"}," · "+c.pilot)]:[])),
@@ -640,12 +640,90 @@ DATA.loading=true;
 fetchJSON(V1_FLAT).then(function(d){DATA.v1files=d.files.map(function(f){return f.name}).filter(function(n){return/\.(png|jpg)$/i.test(n)});DATA.loading=false;render()}).catch(function(e){DATA.err=String(e.message||e);DATA.loading=false;render()});
 }
 function shipBase(p){return p.split("/").pop().replace(".json","")}
-var BRX={mode:"upgrades",q:"",type:"",fac:"",fmt:"",lim:150};
+var BRX={mode:"cards",q:"",type:"",fac:"",fmt:"",lim:150};
+var C2={data:null,err:null,loading:false};
+var C2FAC={rebelalliance:"Rebel Alliance",galacticempire:"Galactic Empire",scumandvillainy:"Scum and Villainy",galacticrepublic:"Galactic Republic",separatistalliance:"Separatist Alliance",resistance:"Resistance",firstorder:"First Order"};
+var BC={kind:"pilots",q:"",fac:"All",ship:"All",slot:"All",fmt:"",lim:36};
+function loadC2(){
+if(C2.data||C2.loading||C2.err)return;
+C2.loading=true;
+fetch("data/cards2.json").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(d){C2.data=d;C2.loading=false;render()}).catch(function(e){C2.err=String(e.message||e);C2.loading=false;render()});
+}
+function cardImg(kind,xws,fallback,full,style,alt){
+var base=(xws||"").split("-")[0],urls=[];
+var fa=function(x){return GOLD+"Art/"+kind+"/"+x+".jpg"},fe=function(x){return GOLD+"En/"+kind+"/"+x+".png"};
+var order=full?[fe,fa]:[fa,fe];
+[xws,base].forEach(function(x){if(!x)return;order.forEach(function(f){var u=f(x);if(urls.indexOf(u)<0)urls.push(u)})});
+if(fallback)urls.push(fallback);
+var i=0;
+var im=h("img",{src:urls[0],alt:alt||"",loading:"lazy",style:style||"",onerror:function(){i++;if(i<urls.length)im.src=urls[i];else im.style.display="none"}});
+return im;
+}
+function brxBar(){
+return h("div",{class:"row"},[["cards","Cards"],["upgrades","Points: upgrades"],["pilots","Points: pilots"]].map(function(m){
+return btn(m[1],function(){BRX.mode=m[0];BRX.lim=150;BC.lim=36;render()},BRX.mode===m[0]?"p":"");
+}));
+}
+function viewBrowserC(){
+loadC2();
+var top=h("div",{class:"card"},[h("h2",{},"XWA and 2nd Edition database"),brxBar()]);
+if(!C2.data)return h("div",{},[top,h("div",{class:"card"},C2.err?[h("div",{class:"note bad"},"Could not load data/cards2.json ("+esc(C2.err)+")"),btn("Retry",function(){C2.err=null;render()},"p")]:"Loading cards…")]);
+var D=C2.data,isP=BC.kind==="pilots",q=BC.q.toLowerCase();
+var facs=["All"].concat(Object.keys(C2FAC));
+var shipNames=Array.from(new Set(D.pilots.filter(function(p){return BC.fac==="All"||p[0]===BC.fac}).map(function(p){return p[1]}))).sort();
+var slots=["All"].concat(Array.from(new Set(D.upgrades.reduce(function(a,u){return a.concat(u[1])},[]))).sort());
+var rows=isP?D.pilots.filter(function(p){
+if(BC.fac!=="All"&&p[0]!==BC.fac)return false;
+if(BC.ship!=="All"&&p[1]!==BC.ship)return false;
+if(BC.fmt==="std"&&!p[13])return false;
+if(BC.fmt==="ext"&&!p[14])return false;
+return!q||(p[2]+" "+p[3]+" "+p[1]+" "+p[8]+" "+p[9]).toLowerCase().indexOf(q)>=0;
+}):D.upgrades.filter(function(u){
+if(BC.slot!=="All"&&u[1].indexOf(BC.slot)<0)return false;
+var rf=u[4].split("; ")[0].split("/").filter(function(x){return C2FAC[x]});
+if(BC.fac!=="All"&&rf.length&&rf.indexOf(BC.fac)<0)return false;
+if(BC.fmt==="std"&&!u[8])return false;
+if(BC.fmt==="ext"&&!u[9])return false;
+return!q||(u[0]+" "+u[3]+" "+u[4]).toLowerCase().indexOf(q)>=0;
+});
+var ctl=[
+btn("Pilots ("+D.pilots.length+")",function(){BC.kind="pilots";BC.lim=36;render()},isP?"p":""),
+btn("Upgrades ("+D.upgrades.length+")",function(){BC.kind="upgrades";BC.lim=36;render()},isP?"":"p"),
+h("div",{class:"f"},field("Search",txt(BC.q,function(v){BC.q=v;BC.lim=36;render()}))),
+h("div",{},field("Faction",sel(facs.map(function(f){return[f,C2FAC[f]||f]}),BC.fac,function(v){BC.fac=v;BC.ship="All";BC.lim=36;render()}))),
+isP?h("div",{},field("Ship",sel(["All"].concat(shipNames),BC.ship,function(v){BC.ship=v;BC.lim=36;render()}))):h("div",{},field("Slot",sel(slots,BC.slot,function(v){BC.slot=v;BC.lim=36;render()}))),
+h("div",{},field("Format",sel([["","Any"],["std","Standard"],["ext","Extended"]],BC.fmt,function(v){BC.fmt=v;BC.lim=36;render()})))
+];
+top.appendChild(h("div",{class:"row",style:"margin-top:8px"},ctl));
+top.appendChild(h("div",{class:"dim"},rows.length+" cards. Text from xwing-data2; pictures from project-goldenrod (and the original image when it has no copy)."));
+var cards=rows.slice(0,BC.lim).map(function(r){
+if(isP){
+var sh=D.ships[r[1]]||["",[],[]];
+return h("div",{class:"card"},[
+cardImg("pilots",r[11],r[12],true,"width:100%;border-radius:8px",r[2]),
+h("h3",{style:"margin-top:8px"},(r[10]?"•".repeat(r[10])+" ":"")+r[2]+(r[3]?" - "+r[3]:"")),
+h("div",{class:"dim"},(C2FAC[r[0]]||r[0])+" · "+r[1]+" · "+sh[0]),
+h("div",{class:"dim"},"Initiative "+r[4]+" · Cost "+r[5]+(r[6]>=0?" · Loadout "+r[6]:"")),
+h("div",{style:"margin:4px 0"},r[7].map(ckBadge)),
+r[8]?h("div",{style:"font-size:13px"},r[8]):null,
+r[9]?h("div",{class:"dim",style:"font-size:12px;font-style:italic"},r[9]):null,
+h("div",{class:"dim",style:"font-size:12px;margin-top:4px"},sh[1].join(" · ")+(sh[2].length?" · "+sh[2].join(", "):""))
+]);
+}
+return h("div",{class:"card"},[
+cardImg("upgrades",r[5],r[10],true,"width:100%;border-radius:8px",r[0]),
+h("h3",{style:"margin-top:8px"},(r[6]?"•".repeat(r[6])+" ":"")+r[0]),
+h("div",{style:"margin:4px 0"},r[1].map(ckBadge)),
+h("div",{class:"dim"},"Cost "+r[2]+(r[7]?" · Charges "+r[7]:"")),
+r[4]?h("div",{class:"dim",style:"font-size:12px"},"Restriction: "+r[4].replace(/rebelalliance|galacticempire|scumandvillainy|galacticrepublic|separatistalliance|resistance|firstorder/g,function(m){return C2FAC[m]})):null,
+h("div",{style:"font-size:13px;white-space:pre-wrap"},r[3])
+]);
+});
+return h("div",{},[top,h("div",{class:"grid g3",style:"margin-top:12px"},cards),rows.length>BC.lim?h("div",{class:"row",style:"margin-top:12px"},[btn("Show more",function(){BC.lim+=36;render()},"p"),btn("Show all",function(){BC.lim=rows.length;render()})]):null]);
+}
 function viewBrowserX(){
 var q=BRX.q.toLowerCase();
-var modes=h("div",{class:"row"},[["upgrades","Upgrades"],["pilots","Pilots"],["online","Card text and art (online)"]].map(function(m){
-return btn(m[1],function(){BRX.mode=m[0];BRX.lim=150;render()},BRX.mode===m[0]?"p":"");
-}));
+var modes=brxBar();
 var types=Array.from(new Set(XWA.upgrades.reduce(function(a,u){return a.concat(u[2])},[]))).sort();
 var ctl=[
 h("div",{class:"f"},field("Search",txt(BRX.q,function(v){BRX.q=v;BRX.lim=150;render()}))),
@@ -682,6 +760,7 @@ h("div",{class:"card",style:"overflow-x:auto"},[tbl,rows.length>shown.length?btn
 ]);
 }
 function viewBrowser(){
+if(S.edition==="xwa"&&BRX.mode==="cards")return viewBrowserC();
 if(S.edition==="xwa"&&BRX.mode!=="online")return viewBrowserX();
 if(S.edition==="xwa"){var bk=btn("Back to XWA points data",function(){BRX.mode="upgrades";render()},"p")}
 var out=[];
