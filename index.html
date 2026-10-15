@@ -199,7 +199,7 @@ h("div",{class:"row",style:"margin-top:10px"},[
 btn("Mission complete (next mission)",function(){log("Mission "+S.mission+" complete (season "+S.season+")");S.mission++;refresh()},"p"),
 btn("Next season",function(){S.season++;S.mission=1;log("Season "+S.season+" begins");refresh()})
 ]),
-S.edition==="xwa"?h("div",{class:"note"},"XWA uses the 2023 rulebook, rules reference and errata, and the 2024 points documents. Read them on the Rules tab; the game tracker is on Rules / Play."):null
+S.edition==="xwa"?h("div",{class:"note"},"XWA uses the 2023 rulebook, rules reference and errata, and the 2024 points documents. Read them on the Rules and Books tab."):null
 ]);
 var b=h("div",{class:"card"},[
 h("h2",{},"Squadron"),
@@ -218,7 +218,7 @@ var p=newPlayer();p.ship=f[0];p.xp=f[1];S.players.push(p);log("Pilot added in "+
 S.module==="pallas"?h("div",{class:"note"},"Pallas: every ship starts at PS 2. New ships cost 5 XP. Below 5 XP, rejoin in a Z-95 and lose 1 XP (XP can go negative)."):null
 ]);
 var c=h("div",{class:"card"},[h("h2",{},"Log"),h("div",{class:"log"},S.log.map(function(l){return h("div",{},l)})),h("div",{class:"row",style:"margin-top:8px"},[btn("Add note",function(){var t=prompt("Log note");if(t){log(t);refresh()}}),btn("Clear log",function(){S.log=[];refresh()})])]);
-return h("div",{class:"grid g2"},[a,b,c]);
+return h("div",{},[h("div",{class:"grid g2"},[a,b,c]),S.edition==="xwa"?null:viewHotacRules()]);
 }
 function viewLanding(){
 return h("div",{class:"card",style:"max-width:760px;margin:0 auto;text-align:center"},[
@@ -1078,8 +1078,11 @@ btn("Reset everything",function(){if(confirm("Delete the whole campaign?")){S=bl
 h("div",{class:"note"},"Campaign data is stored in this browser (localStorage). Export a JSON file to back up or move devices.")
 ]);
 var c=h("div",{class:"card"},[
-h("h2",{},"Sources"),
-h("div",{class:"dim"},"XWA card data: xwing-data2 (MIT). 1E card images: voidstate/xwing-card-images. AI random tables: HotAC AI Ship Random Generator v0.5. Campaign rules: Heroes of the Aturi Cluster by Josh Derksen and community modules. Unofficial fan tool, not affiliated with or endorsed by Fantasy Flight Games, Atomic Mass Games or Lucasfilm.")
+h("h2",{},"Standard scenarios"),
+sel(XWA_SCENARIOS.map(function(x,i){return[String(i),x[0]]}),String(XW.scen),function(v){XW.scen=Number(v);xsave()}),
+h("div",{class:"note"},XWA_SCENARIOS[XW.scen][1]),
+btn("Random scenario",function(){XW.scen=rr(0,3);xsave()}),
+h("div",{class:"dim",style:"margin-top:8px"},"Play area 3'×3'. Six obstacles (asteroid, debris field, gas cloud). Ends when only one player has ships left, at 20+ mission points with a lead, or after round 12.")
 ]);
 return h("div",{class:"grid g2"},[a,b,c]);
 }
@@ -2006,8 +2009,8 @@ btn("Remove",function(){sq.ships.splice(si,1);refresh()},"d")
 return h("div",{},[bar,out,h("div",{style:"height:12px"}),addp,h("div",{class:"grid g3",style:"margin-top:12px"},cards)]);
 }
 
-var TABS=[["pilots","Cockpit",viewPilots],["campaign","Campaign",viewCampaign],["ai","AI Ships",viewAI],["browser","Database",viewBrowser],["docs","Rules and Books",viewDocs],["rules","Rules / Play",viewRules],["settings","Settings",viewSettings]];
-var TOOLIDS=["campaign","ai","browser","docs","rules","settings"];
+var TABS=[["pilots","Cockpit",viewPilots],["campaign","Campaign",viewCampaign],["ai","AI Ships",viewAI],["browser","Database",viewBrowser],["docs","Rules and Books",viewDocs],["settings","Settings",viewSettings]];
+var TOOLIDS=["campaign","ai","browser","docs","settings"];
 var toolsOpen=false;
 function render(){
 var es=document.getElementById("edSel");
@@ -2023,7 +2026,7 @@ nav2.innerHTML="";
 nav2.style.display=(toolsOpen||onTool)?"":"none";
 TABS.forEach(function(t){if(TOOLIDS.indexOf(t[0])<0)return;nav2.appendChild(h("button",{class:S.tab===t[0]?"on":"",onclick:function(){S.tab=t[0];toolsOpen=true;refresh()},type:"button"},t[1]))});
 var main=document.getElementById("main");main.innerHTML="";
-if(S.tab==="builder")S.tab="pilots";
+if(S.tab==="builder"||S.tab==="rules")S.tab="pilots";
 var t=TABS.filter(function(x){return x[0]===S.tab})[0]||TABS[0];
 if(!S.navv){S.navv=2;if(S.tab==="builder")S.tab="pilots";t=TABS.filter(function(x){return x[0]===S.tab})[0]||TABS[0]}
 main.appendChild(t[2]());

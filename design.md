@@ -260,3 +260,7 @@ The pasted Force rules (a Force ability costing double, or initiative times 4) w
 ## 37. Squad builder removed
 
 The Squad Builder tab is gone from Tools. The builder functions are still in the file but nothing links to them, because the Database and XWA data code share helpers with them. A saved tab of "builder" falls back to the Cockpit.
+
+## 38. Rules / Play removed, scenarios moved
+
+The Rules / Play tab is gone. The Standard scenarios card now sits on the Campaign page, and the HotAC rules summary shows under it for the HotAC editions. The Sources card was removed from the Campaign page. A saved tab of "rules" falls back to the Cockpit.
