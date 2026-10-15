@@ -4,3 +4,4 @@ dist
 data/cache
 assets/cache
 .env
+scripts/__pycache__/
