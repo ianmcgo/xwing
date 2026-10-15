@@ -144,7 +144,7 @@ The cockpit Store and Upgrades window use the same fallback chain, starting with
 
 ## 19. Footer links
 
-A footer under every page links to Patreon (https://www.patreon.com/cw/ianmcg, same page the FreeSpace 4x game uses), the FreeSpace 4x game, the Cabal Coffers site and the YouTube channel. It is hidden when printing.
+A footer under every page links to Patreon (https://www.patreon.com/cw/ianmcg, same page the FreeSpace 4x game uses), the website (https://ianmcgo.github.io/website/) and the Cabal Coffers site. It is hidden when printing.
 
 ## 20. Visit tracker
 
