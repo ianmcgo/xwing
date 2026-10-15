@@ -1459,7 +1459,7 @@ function e1expPanel(){
 S.exp1=S.exp1||{};
 return h("div",{class:"card"},[
 h("h3",{},"My expansions"),
-h("div",{class:"dim"},"Enter how many of each product you own. Cards in those products count as owned for the Owned only filter here and in the builder."),
+h("div",{class:"dim"},"Enter how many of each product you own. Cards in those products count as owned for the Owned only filter here."),
 h("div",{class:"row"},[btn("Clear all",function(){S.exp1={};refresh()},"d")]),
 h("table",{},E1_SRC.map(function(s,i){
 var cards=Object.keys(s[2]).length+Object.keys(s[3]).length;
@@ -2006,8 +2006,8 @@ btn("Remove",function(){sq.ships.splice(si,1);refresh()},"d")
 return h("div",{},[bar,out,h("div",{style:"height:12px"}),addp,h("div",{class:"grid g3",style:"margin-top:12px"},cards)]);
 }
 
-var TABS=[["pilots","Cockpit",viewPilots],["campaign","Campaign",viewCampaign],["ai","AI Ships",viewAI],["builder","Squad Builder",viewBuilder],["browser","Database",viewBrowser],["docs","Rules and Books",viewDocs],["rules","Rules / Play",viewRules],["settings","Settings",viewSettings]];
-var TOOLIDS=["campaign","ai","builder","browser","docs","rules","settings"];
+var TABS=[["pilots","Cockpit",viewPilots],["campaign","Campaign",viewCampaign],["ai","AI Ships",viewAI],["browser","Database",viewBrowser],["docs","Rules and Books",viewDocs],["rules","Rules / Play",viewRules],["settings","Settings",viewSettings]];
+var TOOLIDS=["campaign","ai","browser","docs","rules","settings"];
 var toolsOpen=false;
 function render(){
 var es=document.getElementById("edSel");
@@ -2023,6 +2023,7 @@ nav2.innerHTML="";
 nav2.style.display=(toolsOpen||onTool)?"":"none";
 TABS.forEach(function(t){if(TOOLIDS.indexOf(t[0])<0)return;nav2.appendChild(h("button",{class:S.tab===t[0]?"on":"",onclick:function(){S.tab=t[0];toolsOpen=true;refresh()},type:"button"},t[1]))});
 var main=document.getElementById("main");main.innerHTML="";
+if(S.tab==="builder")S.tab="pilots";
 var t=TABS.filter(function(x){return x[0]===S.tab})[0]||TABS[0];
 if(!S.navv){S.navv=2;if(S.tab==="builder")S.tab="pilots";t=TABS.filter(function(x){return x[0]===S.tab})[0]||TABS[0]}
 main.appendChild(t[2]());
