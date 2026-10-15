@@ -242,3 +242,11 @@ The Force User class was removed because the Republic covers it. Pilots saved as
 ## 34. Separatists update
 
 Separatists now start in the Vulture-class Droid Fighter (18 XP), Droid Tri-Fighter (12 XP), Hyena Droid Bomber (10 XP) or Nantex-class Fighter (5 XP), values supplied by the user. The Belbullab-22 is a later unlock at initiative 3 or more; the user gave no cost, so it is an estimate of rank 2 and 8 XP in `HC_UNLOCK`, shown as "(estimate)".
+
+## 35. Resistance and First Order updates
+
+The Resistance now starts in the BTA-NR2 Y-Wing (15 XP), RZ-2 A-Wing (8 XP) or T-70 X-Wing (5 XP). The Resistance Transport Pod and the MG-100 StarFortress are story unlocks: instead of a price they show an "Unlocked by a story mission" button that adds the ship for free when your campaign unlocks it (`story:true` in `HC_UNLOCK`).
+
+The First Order now starts in the TIE/fo Fighter (14 XP), TIE/sf Fighter (8 XP) or TIE/ba Interceptor (3 XP). The TIE/vn Silencer unlocks at initiative 4 or 5; the first is used, so it is rank 3 (initiative 4) at an estimated 12 XP, shown as "(estimate)".
+
+All of the starting XP values for the Empire, Republic, Separatists, Resistance and First Order came from the user and are not checked against a source.
