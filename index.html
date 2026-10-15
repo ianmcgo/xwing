@@ -70,7 +70,7 @@ var EDITIONS={
 "1e":{label:"1st Edition",ps:"Pilot Skill",src:"v1"},
 "2e":{label:"2.0",ps:"Initiative",src:"v2",ref:"xwing-2.0"},
 "2.5e":{label:"2.5 / AMG",ps:"Initiative",src:"v2",ref:"3.9.1"},
-"xwa":{label:"XWA",ps:"Initiative",src:"v2",ref:"3.9.1"}
+"xwa":{label:"XWA (X-Wing Alliance)",ps:"Initiative",src:"v2",ref:"3.9.1"}
 };
 var MODULES={
 "hotac":{label:"Heroes of the Aturi Cluster 2.07",newShip:null},
@@ -178,7 +178,7 @@ btn("Mission complete (next mission)",function(){log("Mission "+S.mission+" comp
 btn("Next season",function(){S.season++;S.mission=1;log("Season "+S.season+" begins");refresh()})
 ]),
 S.edition==="2.5e"?h("div",{class:"note"},"2.5 / AMG uses the 2023 rulebook, rules reference and errata, and the 2024 points documents. Use the Rules tab to read them and the Rules / Play tab for the game tracker."):null,
-S.edition==="xwa"?h("div",{class:"note"},"XWA rules documents have not been added yet."):null
+S.edition==="xwa"?h("div",{class:"note"},"XWA is the X-Wing Alliance community organization. Its points companion, rules, errata and ban list documents have not been added yet."):null
 ]);
 var b=h("div",{class:"card"},[
 h("h2",{},"Squadron"),
@@ -591,7 +591,7 @@ h("div",{},[
 return h("div",{class:"grid g2"},[setup,side(m.p1),side(m.p2),scen,rules]);
 }
 function viewRules(){
-if(S.edition==="xwa")return h("div",{class:"card"},"No XWA rules have been added yet, so there is no tracker for this edition.");
+if(S.edition==="xwa")return h("div",{class:"card"},"XWA rules documents have not been added yet, so there is no tracker for this edition.");
 if(S.edition==="2.5e")return viewXWA();
 return viewHotacRules();
 }

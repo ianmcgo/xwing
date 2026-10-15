@@ -17,7 +17,7 @@ Not in scope: an on-screen board, movement, dice, or online play. The campaign t
 | 1st Edition | 100 points, pilot skill | guidokessels/xwing-data (297 pilots, 367 upgrades, 56 ships) plus card art from voidstate/xwing-card-images and the xwing-data images folder | master |
 | 2.0 | 200 points, pilot costs in the 40s | xwingtmg/xwing-data2 | tag xwing-2.0 (data version 2.5.3) |
 | 2.5 / AMG | 20 squad points, per-ship loadout value; rulebook v1.1.1, Rules Reference v1.4.6, Errata v1.8.2, ship points 2024-09-06, upgrade points 2024-11-01 | xwing-data2 tag 3.9.1 for card text and art (its points predate the 2024 sheets); the points PDFs are the source of truth | 3.9.1 |
-| XWA | Rules not yet supplied | To be decided | 3.9.1 placeholder |
+| XWA (X-Wing Alliance) | Community-run organized play body (volunteer group formed June 2024, not affiliated with Lucasfilm or Asmodee). Documents per your description: 50P Points Companion, XWA Core Rules and Rules Reference, errata, ban and restricted lists. Not yet supplied. | Points and legality from the XWA documents, card data from xwing-data2 | 3.9.1 placeholder |
 
 Checked against the real tags: points on the 2.0 tag are on the old 200-point scale, and every 3.x tag is on the new 20-point scale with loadout values.
 
@@ -113,3 +113,7 @@ The current `index.html` already contains the campaign trackers, an AI ship gene
 - The previous 1E tab depended on the jsDelivr file-listing API, which I could not reach from my environment and had only tested against a stub. That is the likely reason the cards did not show.
 - Database is now the default tab.
 - Still not built: the squad builder.
+
+## 14. XWA definition
+
+XWA is the X-Wing Alliance, a community organization running organized play and rules and points updates for X-Wing. A June 2025 roadmap article states it is a volunteer group formed in June 2024 with elected council, planned a Q4 2025 points update and a March 2026 world championship, and does not represent Lucasfilm or Asmodee. The article does not list its documents or version numbers, so the document list above comes from your description and is unverified. The XWA site and documents are not reachable from the build environment; they need uploading. The XWA edition then gets the same Rules tab treatment as 2.5 / AMG and its own builder rules (points scale, ban and restricted lists).
