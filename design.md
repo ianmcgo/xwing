@@ -141,3 +141,7 @@ Pilots saved before the starting-XP change (0 XP, nothing bought) get their star
 `data/cards2.json` (built by `scripts/build_cards2.py` from xwing-data2) holds all 672 pilots, 524 upgrades and 89 ships with text, cost, loadout, slots and legality. The XWA Database tab loads it from the site itself (no CDN), so it no longer depends on jsDelivr. Cards show the full card image from project-goldenrod (`En/<kind>/<xws>.png`), then the cropped art, then the same names without the expansion suffix, then the original xwing-data2 image. Some of the newest cards are not in the goldenrod repo and rely on that last fallback. The points tables from the PDFs stay under "Points: upgrades" and "Points: pilots".
 
 The cockpit Store and Upgrades window use the same fallback chain, starting with the cropped art. The first version only tried the exact xws name, which failed for cards with expansion suffixes such as "-battleofyavin".
+
+## 19. Footer links
+
+A footer under every page links to Patreon (https://www.patreon.com/cw/ianmcg, same page the FreeSpace 4x game uses), the FreeSpace 4x game, the Cabal Coffers site and the YouTube channel. It is hidden when printing.
