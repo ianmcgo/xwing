@@ -164,12 +164,13 @@ return {name:"",ship:ship,ps:S.module==="pallas"?2:1,xp:start,kills:0,upgrades:[
 }
 
 function viewCampaign(){
-var sub=S.campSub==="hangar"?"hangar":"main";
+var sub=S.campSub==="hangar"?"hangar":S.campSub==="missions"?"missions":"main";
 var bar=h("div",{class:"row",style:"margin-bottom:12px"},[
 btn("Campaign",function(){S.campSub="main";refresh()},sub==="main"?"p":""),
-btn("Hangar",function(){S.campSub="hangar";refresh()},sub==="hangar"?"p":"")
+btn("Hangar",function(){S.campSub="hangar";refresh()},sub==="hangar"?"p":""),
+btn("Missions",function(){S.campSub="missions";refresh()},sub==="missions"?"p":"")
 ]);
-return h("div",{},[bar,sub==="hangar"?viewHangar():viewCampaignMain()]);
+return h("div",{},[bar,sub==="hangar"?viewHangar():sub==="missions"?viewMissions():viewCampaignMain()]);
 }
 function viewCampaignMain(){
 var m=MODULES[S.module];
@@ -194,8 +195,8 @@ h("h2",{},"Squadron"),
 h("div",{class:"big"},S.players.length+" pilot"+(S.players.length===1?"":"s")),
 h("div",{class:"dim"},"Total XP held: "+S.players.reduce(function(s,p){return s+p.xp},0)+"  ·  Pool: "+S.pool),
 h("div",{class:"row",style:"margin-top:10px"},[
-btn("Add pilot",function(){if(S.players.length>=4&&!confirm("More than 4 pilots. Add anyway?"))return;S.players.push(newPlayer());log("Pilot added");S.tab="pilots";refresh()},"p"),
-S.module==="hotac"?btn("Add pilot: X-wing or Y-wing",function(){var n=prompt("Starting ship: X-wing or Y-wing");if(!n)return;var f=HOTAC_START.filter(function(x){return x[0].toLowerCase()===n.toLowerCase()})[0];if(!f){alert("Choose X-wing or Y-wing");return}var pl=newPlayer();pl.ship=f[0];pl.xp=f[1];pl.ps=2;S.players.push(pl);log("Pilot added in "+f[0]+" with "+f[1]+" XP");refresh()}):null,
+btn("Add pilot",function(){if(S.players.length>=4&&!confirm("More than 4 pilots. Add anyway?"))return;CK.create={name:"",cls:"oldschool"};S.tab="pilots";refresh()},"p"),
+
 S.module==="pallas"?btn("Add pilot with starting XP…",function(){
 var n=prompt("Ship ("+PALLAS_START.map(function(x){return x[0]}).join(", ")+")");
 if(!n)return;
@@ -325,9 +326,13 @@ h("div",{class:"dim"},"Additional ships: "+c.more.join(", "))
 })),
 h("div",{style:"margin:12px 0"},[
 h("h3",{},"Starting ship"),
-h("div",{class:"row"},cls.starts.map(function(n){
+h("div",{class:"grid g3"},cls.starts.map(function(n){
 var on=(C.ship||cls.start)===n;
-return btn(n+" · "+(HC_STARTXP[n]||10)+" XP to start",function(){C.ship=n;render()},on?"p":"");
+return h("div",{class:"card",style:"cursor:pointer;"+(on?"background:#a35f0a;border-color:#f4c430":""),onclick:function(){C.ship=n;render()}},[
+h("b",{},n+(on?" ✔":"")),
+h("div",{style:"margin:6px 0"},HC_SHIPS[n].bar.map(ckBadge)),
+h("div",{class:"dim"},"Starts with "+(HC_STARTXP[n]||10)+" XP")
+]);
 }))
 ]),
 h("div",{class:"note"},"Only two classes are entered so far. Send the other class names, descriptions and ships and they will be added."),
@@ -1644,8 +1649,8 @@ btn("Remove",function(){sq.ships.splice(si,1);refresh()},"d")
 return h("div",{},[bar,out,h("div",{style:"height:12px"}),addp,h("div",{class:"grid g3",style:"margin-top:12px"},cards)]);
 }
 
-var TABS=[["pilots","Pilots",viewPilots],["campaign","Campaign",viewCampaign],["ai","AI Ships",viewAI],["missions","Missions",viewMissions],["builder","Squad Builder",viewBuilder],["browser","Database",viewBrowser],["docs","Rules and Books",viewDocs],["rules","Rules / Play",viewRules],["settings","Settings",viewSettings]];
-var TOOLIDS=["ai","builder","browser","docs","rules","settings"];
+var TABS=[["pilots","Cockpit",viewPilots],["campaign","Campaign",viewCampaign],["ai","AI Ships",viewAI],["builder","Squad Builder",viewBuilder],["browser","Database",viewBrowser],["docs","Rules and Books",viewDocs],["rules","Rules / Play",viewRules],["settings","Settings",viewSettings]];
+var TOOLIDS=["campaign","ai","builder","browser","docs","rules","settings"];
 var toolsOpen=false;
 function render(){
 var sub=document.getElementById("subtitle");

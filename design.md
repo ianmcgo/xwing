@@ -108,7 +108,7 @@ Campaign library: Defenders of the Empire, Flight Group Alpha (with card pack an
 
 ## 13. Navigation
 
-Main tabs are the hero and campaign tools: Pilots (the hero builder, now the default), Campaign (with a Hangar button inside) and Missions. A Tools button opens a second row with AI Ships, Squad Builder (standard play), Database, Rules and Books, Rules / Play and Settings. Saved sessions that opened on the builder move to Pilots once.
+The main bar has Cockpit (the hero builder, opens by default) and Tools. Tools holds Campaign (with Hangar and Missions buttons inside), AI Ships, Squad Builder, Database, Rules and Books, Rules / Play and Settings. Saved sessions that opened on the builder move to the cockpit once.
 
 ## 14. Pilot cockpit (replaces the pilot sheet)
 
