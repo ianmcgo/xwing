@@ -206,7 +206,7 @@ h("h2",{},"Squadron"),
 h("div",{class:"big"},S.players.length+" pilot"+(S.players.length===1?"":"s")),
 h("div",{class:"dim"},"Total XP held: "+S.players.reduce(function(s,p){return s+p.xp},0)+"  ·  Pool: "+S.pool),
 h("div",{class:"row",style:"margin-top:10px"},[
-btn("Add pilot",function(){if(S.players.length>=4&&!confirm("More than 4 pilots. Add anyway?"))return;CK.create={name:"",cls:null};S.tab="pilots";refresh()},"p"),
+btn("Add pilot",function(){if(S.players.length>=4&&!confirm("More than 4 pilots. Add anyway?"))return;CK.create={name:"",cls:null,exp:null,career:null};S.tab="pilots";refresh()},"p"),
 
 S.module==="pallas"?btn("Add pilot with starting XP…",function(){
 var n=prompt("Ship ("+PALLAS_START.map(function(x){return x[0]}).join(", ")+")");
@@ -229,7 +229,7 @@ h("p",{},"The Empire outnumbers us greatly here, with a planetary garrison on Nu
 h("p",{},"Perhaps you will become the heroes the Rebellion desperately needs.")
 ]),
 h("div",{class:"row",style:"justify-content:center"},[
-btn("Create new pilot",function(){S.introSeen=true;CK.create={name:"",cls:null};render()},"p")
+btn("Create new pilot",function(){S.introSeen=true;CK.create={name:"",cls:null,exp:null,career:null};render()},"p")
 ]),
 ]);
 }
@@ -268,6 +268,10 @@ var HC_CLASSES=[
 {id:"republic",name:"The Galactic Republic",desc:"A clone-war era pilot of the Republic navy, flying Torrents, Headhunters and Jedi starfighters.",start:"V-19 Torrent",starts:["V-19 Torrent","Clone Z-95 Headhunter","Delta-7"],more:["Clone Z-95 Headhunter","Delta-7"],fan:true}
 ];
 var HC_RANKCOST=[0,0,9,12,15,18];
+var HC_EXPS={hotac:{label:"Heroes of the Aturi Cluster 2.07",desc:"Standard rules: pilots start at initiative 2 with 10 XP."},plotac:{label:"Pirate Lords of the Aturi Cluster",desc:"Scum campaign: pilots start at initiative 1 with 0 XP and 0 credits, and pick a career. Track credits in the cockpit."}};
+var PLOTAC_CAREERS=[["Organizer","Escape Craft with Novice Technician"],["Professional","TYE-Wing with Bolt On Ion Cannon"],["Gambler","TYE-Wing with Scavenged Shield Generator"],["Slicer","TYE-Wing with Homemade Signal Jammer"],["Gearhead","TYE-Wing with Podracer's Handicap"],["Demolitions","TNT/mt with Improvised Bomb Rack"],["Cyborg","TNT/apt with Contraband Cybernetics"],["Miner","Modified TIE/ln"]];
+function hcInit(p,r){return r+(p.exp==="plotac"?0:1)}
+function hcExpOptions(cls){return cls&&cls.id==="scum"?["hotac","plotac"]:["hotac"]}
 var HC_SHIPCOST=5;
 var HC_STARTXP={"X-Wing":10,"Y-Wing":16};
 var HC_MAP=null;
@@ -285,7 +289,7 @@ if(!HC_SHIPS[p.ship])p.ship="X-Wing";
 if(!p.xpInit){p.xpInit=1;if(!(p.xp>0)&&!p.kills&&!Object.keys(p.deck||{}).length&&!Object.keys(p.owned||{}).length)p.xp=HC_STARTXP[p.ship]||10}
 if(!p.cls)p.cls="oldschool";
 if(!p.rank)p.rank=Math.min(5,Math.max(1,(p.ps||2)-1));
-p.ps=p.rank+1;
+p.ps=hcInit(p,p.rank);
 if(!p.owned)p.owned={};
 p.owned[p.ship]=1;
 if(!p.deck)p.deck={};
@@ -395,7 +399,7 @@ btn("Print",function(){window.print()},"p"),
 btn("Close",function(){sheet.remove();document.body.classList.remove("psheet-open")})
 ]),
 h("h1",{style:"margin:0;font-size:24px;color:#000;letter-spacing:0"},(p.name||"Pilot")+" · "+(cls?cls.name:p.cls)),
-h("div",{style:"margin:4px 0 10px"},"Heroes of the Aturi Cluster pilot sheet · "+new Date().toLocaleDateString()),
+h("div",{style:"margin:4px 0 10px"},(HC_EXPS[p.exp||"hotac"].label)+" pilot sheet · "+new Date().toLocaleDateString()+(p.exp==="plotac"?" · Career: "+(p.career||"none")+" · Credits: $"+(p.credits||0)+"k":"")),
 h("table",{style:"border-collapse:collapse;width:100%;margin-bottom:10px"},[
 th(["Ship","Rank","Initiative","XP","Kills"]),
 tr([p.ship,String(p.rank),String(p.ps),String(p.xp||0),String(p.kills||0)])
@@ -447,7 +451,7 @@ h("div",{class:"dim"},"Configure your pilot's identity, class and starting ship"
 h("div",{style:"max-width:320px;margin:10px 0"},field("Callsign",txt(C.name,function(v){C.name=v}))),
 h("div",{class:"grid g3"},HC_CLASSES.filter(function(c){return!C.cls||c.id===C.cls}).map(function(c){
 var on=c.id===C.cls;
-return h("div",{class:"card",style:"cursor:pointer;"+(on?"border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)":""),onclick:function(){if(C.cls!==c.id){C.cls=c.id;C.ship=null}render()}},[
+return h("div",{class:"card",style:"cursor:pointer;"+(on?"border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)":""),onclick:function(){if(C.cls!==c.id){C.cls=c.id;C.ship=null;C.career=null;var o=hcExpOptions(c);C.exp=o.length===1?o[0]:null}render()}},[
 h("h3",{},c.name+(on?" ✔":"")),
 h("div",{style:"font-size:13px"},c.desc),
 h("div",{class:"dim",style:"margin-top:6px"},"Starts in: "+c.start),
@@ -455,7 +459,22 @@ h("div",{class:"dim"},"Additional ships: "+c.more.join(", ")),
 c.fan?h("div",{class:"dim",style:"font-size:11px;margin-top:4px"},"Community conversion: ships are unverified"):null
 ]);
 })),
-cls?h("div",{style:"margin:12px 0"},[
+cls&&hcExpOptions(cls).length>1?h("div",{style:"margin:12px 0"},[
+h("h3",{},"Are you playing an expansion?"),
+h("div",{class:"grid g3"},hcExpOptions(cls).map(function(k){
+var on=C.exp===k;
+return h("div",{class:"card",style:"cursor:pointer;"+(on?"background:#a35f0a;border-color:#f4c430":""),onclick:function(){C.exp=k;C.ship=null;C.career=null;render()}},[h("b",{},HC_EXPS[k].label+(on?" ✔":"")),h("div",{class:"dim",style:"margin-top:6px"},HC_EXPS[k].desc)]);
+}))
+]):null,
+cls&&C.exp==="plotac"?h("div",{style:"margin:12px 0"},[
+h("h3",{},"Choose your career"),
+h("div",{class:"grid g3"},PLOTAC_CAREERS.map(function(cr){
+var on=C.career===cr[0];
+return h("div",{class:"card",style:"cursor:pointer;"+(on?"background:#a35f0a;border-color:#f4c430":""),onclick:function(){C.career=cr[0];render()}},[h("b",{},cr[0]+(on?" ✔":"")),h("div",{class:"dim",style:"margin-top:6px"},"Career ship in the campaign: "+cr[1])]);
+})),
+h("div",{class:"note"},"The career ships (TYE-Wing, TNT and Escape Craft) are custom cards that are not in the card data, so pick the closest ship below and note your career.")
+]):null,
+cls&&C.exp?h("div",{style:"margin:12px 0"},[
 h("h3",{},"Choose your starting ship"),
 h("div",{class:"grid g3"},cls.starts.map(function(n){
 var on=C.ship===n;
@@ -468,11 +487,12 @@ h("div",{class:"dim"},"Starts with "+(HC_STARTXP[n]||10)+" XP")
 ]):h("div",{class:"dim",style:"margin:12px 0"},"Pick a class to see its starting ships."),
 cls?h("div",{style:"margin:8px 0"},btn("◀ Back to factions",function(){C.cls=null;C.ship=null;render()})):null,
 btn("Create pilot",function(){
-if(!cls||!C.ship){alert("Pick a class and a starting ship first");return}
+if(!cls||!C.exp||!C.ship||(C.exp==="plotac"&&!C.career)){alert("Pick a faction, "+(cls&&hcExpOptions(cls).length>1?"whether you play an expansion, ":"")+(C.exp==="plotac"?"a career, ":"")+"and a starting ship first");return}
 var p=newPlayer();
 p.name=C.name||"Pilot "+(S.players.length+1);
 var ship=C.ship;
-p.cls=cls.id;p.ship=ship;p.rank=1;p.ps=2;p.xp=HC_STARTXP[ship]||10;p.owned={};p.owned[ship]=1;
+p.cls=cls.id;p.ship=ship;p.rank=1;p.exp=C.exp;p.ps=hcInit(p,1);p.xp=C.exp==="plotac"?0:(HC_STARTXP[ship]||10);p.owned={};p.owned[ship]=1;
+if(C.exp==="plotac"){p.career=C.career;p.credits=0;S.module="plotac"}
 S.players.push(p);S.ck=S.players.length-1;CK.create=null;log("Pilot created: "+p.name+" ("+cls.name+")");refresh();
 },"p")
 ]);
@@ -545,11 +565,14 @@ var head=h("div",{class:"card"},[
 h("div",{class:"row",style:"align-items:center"},[
 h("b",{style:"font-size:18px"},cls.name),
 h("span",{style:"color:#f4c430;font-size:18px"},"⚡ "+(p.xp||0)),
+p.exp==="plotac"?h("span",{style:"color:#7ff9a8;font-size:18px"},"$"+(p.credits||0)+"k"):null,
+p.exp==="plotac"?h("span",{class:"dim"},"PLotAC · "+(p.career||"no career")):null,
 h("div",{class:"f"}),
 h("div",{},sel(S.players.map(function(x,i){return[String(i),x.name||"Pilot "+(i+1)]}),String(S.ck),function(v){S.ck=Number(v);CK.pick=null;refresh()})),
 btn("Upgrades",function(){CK.modal=true;CK.mlim=60;render()},"p"),
+p.exp==="plotac"?btn("Add credits",function(){var v=prompt("Credits to add, in thousands (negative to remove)","5");if(v===null)return;var n=Number(v);if(isNaN(n))return;p.credits=(p.credits||0)+n;log(p.name+": "+(n>=0?"+":"")+n+"k credits");refresh()}):null,
 btn("Add XP",function(){var v=prompt("XP to add (negative to remove)","1");if(v===null)return;var n=Number(v);if(isNaN(n))return;p.xp=Math.max(0,(p.xp||0)+n);log(p.name+": "+(n>=0?"+":"")+n+" XP");refresh()}),
-btn("New pilot",function(){CK.create={name:"",cls:null};render()},"p")
+btn("New pilot",function(){CK.create={name:"",cls:null,exp:null,career:null};render()},"p")
 ]),
 h("div",{class:"row",style:"margin-top:8px"},[
 h("div",{style:"width:220px"},field("Callsign",txt(p.name,function(v){p.name=v;refresh()}))),
@@ -590,11 +613,11 @@ var rank=h("div",{class:"card"},[
 h("h3",{},"Rank"),
 h("div",{class:"grid g3"},[1,2,3,4,5].map(function(r){
 var done=p.rank>=r,next=p.rank+1===r,cost=HC_RANKCOST[r];
-var grants=r===1?"Initiative 2":"Initiative "+(r+1)+(r===3?" · Modification slot":" · Ace, Talent or Force slot")+(r===2?" · ships unlock":"");
+var grants=r===1?"Initiative "+hcInit(p,1):"Initiative "+hcInit(p,r)+(r===3?" · Modification slot":" · Ace, Talent or Force slot")+(r===2?" · ships unlock":"");
 return h("div",{class:"card",style:done?"background:#a35f0a;border-color:#f4c430":(next?"":"opacity:.6")},[
-h("div",{class:"row"},[h("b",{class:"f"},"Rank "+r),h("span",{class:"dim"},"In "+(r+1))]),
+h("div",{class:"row"},[h("b",{class:"f"},"Rank "+r),h("span",{class:"dim"},"In "+hcInit(p,r))]),
 h("div",{class:"dim",style:"font-size:12px;margin:4px 0"},grants),
-done?h("div",{style:"color:#f4c430"},"Unlocked"):next?btn("Unlock ⚡ "+cost,function(){if((p.xp||0)<cost){alert("Not enough XP");return}p.xp-=cost;p.rank=r;p.ps=r+1;log(p.name+" reached rank "+r);refresh()},(p.xp||0)>=cost?"p":""):h("div",{class:"dim"},"⚡ "+cost)
+done?h("div",{style:"color:#f4c430"},"Unlocked"):next?btn("Unlock ⚡ "+cost,function(){if((p.xp||0)<cost){alert("Not enough XP");return}p.xp-=cost;p.rank=r;p.ps=hcInit(p,r);log(p.name+" reached rank "+r);refresh()},(p.xp||0)>=cost?"p":""):h("div",{class:"dim"},"⚡ "+cost)
 ]);
 }))
 ]);
@@ -648,8 +671,7 @@ CK.pick?h("div",{class:"note"},"Choosing for slot "+CK.pick.replace(/#.*/,"")+".
 h("div",{},listing)
 ]);
 return h("div",{},[CK.modal?ckModal(p,slots,load):null,head,h("div",{class:"grid",style:"grid-template-columns:minmax(300px,1fr) minmax(300px,1fr);align-items:start;margin-top:12px"},[h("div",{},[loadout,ships,rank]),right]),
-btn("Classic pilot sheet",function(){S.classic=true;refresh()}),
-h("div",{class:"dim",style:"margin-top:10px;font-size:12px"},"Prices default to the card costs in the card data and the HotAC 2.07 pilot ability list. Change any price in the Store if your table uses different values.")]);
+btn("Classic pilot sheet",function(){S.classic=true;refresh()})]);
 }
 function viewPilots(){
 if(!S.classic)return viewCockpit();

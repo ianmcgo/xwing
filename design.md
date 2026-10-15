@@ -210,3 +210,11 @@ Pirate Lords of the Aturi Cluster (PLotAC), the Scum and Villainy campaign from 
 The author publishes the campaign as web pages, with no PDF, so there is nothing to put in the library downloads. The summaries were written from those pages and are short; Rivals 6 and Lost Loot 5B are incomplete in the source, and the Letter of Marque missions beyond number 1 and the canyon mission's name were not found. Setups, enemy lists and maps stay on the author's site.
 
 PLotAC does not use the cockpit's XP and ranks: its pilots start at 0 XP and 0 credits with a career (Organizer, Professional, Gambler, Slicer, Gearhead, Demolitions, Cyborg or Miner) and spend credits. The cockpit does not model careers or credits yet.
+
+## 30. Expansion choice at pilot creation
+
+After picking a faction on the create screen, a faction with more than one ruleset asks "Are you playing an expansion?". Only Scum and Villainy has a choice so far: Heroes of the Aturi Cluster 2.07 (standard) or Pirate Lords of the Aturi Cluster. The other factions use the standard rules and skip the question. The pilot stores the choice as `exp`.
+
+Choosing Pirate Lords changes the cockpit like this: the pilot picks a career (Organizer, Professional, Gambler, Slicer, Gearhead, Demolitions, Cyborg or Miner); starts at 0 XP and initiative 1 (rank n gives initiative n, not n+1); gets a credits counter in the top row with an Add credits button (amounts in thousands); the campaign module switches to Pirate Lords so the Missions tab shows its missions; and the print sheet shows the career and credits. The career ships (TYE-Wing, TNT, Escape Craft) are custom cards missing from the card data, so the pilot flies the closest real ship. Store prices stay in XP, because the PLotAC upgrade prices were not found.
+
+The note about default store prices at the bottom of the cockpit was removed.
