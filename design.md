@@ -276,3 +276,7 @@ Each mission list (HotAC, 1st Edition official, PLotAC) has a Print button. It o
 ## 41. Total XP and XP to spend
 
 Each pilot now tracks XP spent (`p.spent`) next to the XP balance (`p.xp`). The cockpit header and the upgrade store show the balance as "to spend" and balance plus spent as "total". Total XP counts starting XP and everything earned. Pilots saved before this change show their current balance as the total until they spend more.
+
+## 42. Paper size
+
+All print output is set to US Letter, 8.5 by 11 inches, with half inch margins, so the printable area is 7.5 by 10 inches. The pilot and mission sheets are limited to 7.5 inches wide on screen too, so the preview matches the page.
