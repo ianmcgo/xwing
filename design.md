@@ -179,3 +179,9 @@ In the top bar the visitor log is a compact strip (the open-map footer line is h
 ## 25. Pilot creation order
 
 The Create new pilot screen starts with no class selected. Choosing The Old School or The Force User then shows that class's starting ships, and the pilot can only be created once a class and one of those ships are picked.
+
+## 26. Faction classes
+
+Four community conversion classes were added beside the two HotAC 2.07 classes: Scum and Villainy (Z-95 Headhunter, Y-Wing, HWK-290, Mining Guild TIE), The Resistance (T-70 X-Wing, RZ-2 A-Wing), The First Order (TIE/fo, TIE/sf, later the Silencer) and The Galactic Republic (V-19 Torrent, Clone Z-95 Headhunter, Delta-7). They come from a pasted community summary that could not be checked against a HotAC source, so each shows "Community conversion: ships are unverified". Everything else keeps the confirmed rules: a pilot starts with 10 XP and rank 1, and ships cost 5 XP from rank 2.
+
+Slot bars for the new ships are built from the real 2nd edition ship data (the slots that most of that ship's pilots have, leaving out Talent, Force and Device since rank grants those). The summary's "Y-TIE" and "TYE-Wing" were left out because they are not real ships, and its 35 starting points were ignored because they conflict with the 10 XP start. Enemy AI decks for these factions are not included.

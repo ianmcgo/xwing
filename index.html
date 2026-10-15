@@ -241,11 +241,24 @@ var HC_SHIPS={
 "B-Wing":{xws:"asf01bwing",size:"small",cls:"Rebel",bar:["Sensor","Cannon","Cannon","Torpedo","Payload","Modification","Configuration","Ace"]},
 "HWK-290":{xws:"hwk290lightfreighter",size:"small",cls:"Rebel",bar:["Talent","Crew","Payload","Payload","Modification","Modification","Title"]},
 "Eta-2 Actis":{xws:"eta2actis",size:"small",cls:"Jedi",bar:["Talent","Ace","Modification"]},
-"Delta-7":{xws:"delta7aethersprite",size:"small",cls:"Jedi",bar:["Talent","Ace","Modification"]}
+"Delta-7":{xws:"delta7aethersprite",size:"small",cls:"Jedi",bar:["Talent","Ace","Modification"]},
+"Z-95 Headhunter":{xws:"z95af4headhunter",size:"small",cls:"Scum",bar:["Modification","Illicit"]},
+"Mining Guild TIE":{xws:"modifiedtielnfighter",size:"small",cls:"Scum",bar:["Modification"]},
+"T-70 X-Wing":{xws:"t70xwing",size:"small",cls:"Resistance",bar:["Astromech","Modification","Configuration","Tech"]},
+"RZ-2 A-Wing":{xws:"rz2awing",size:"small",cls:"Resistance",bar:["Modification","Tech","Missile"]},
+"TIE/fo Fighter":{xws:"tiefofighter",size:"small",cls:"First Order",bar:["Modification","Tech"]},
+"TIE/sf Fighter":{xws:"tiesffighter",size:"small",cls:"First Order",bar:["Sensor","Modification","Gunner","Tech","Missile"]},
+"TIE/vn Silencer":{xws:"tievnsilencer",size:"small",cls:"First Order",bar:["Torpedo","Missile","Tech","Configuration"]},
+"V-19 Torrent":{xws:"v19torrentstarfighter",size:"small",cls:"Republic",bar:["Missile","Missile","Modification"]},
+"Clone Z-95 Headhunter":{xws:"clonez95headhunter",size:"small",cls:"Republic",bar:["Sensor","Modification"]}
 };
 var HC_CLASSES=[
 {id:"oldschool",name:"The Old School",desc:"A traditional Rebel pilot who starts in an X-Wing and buys more ships as they rank up.",start:"X-Wing",starts:["X-Wing","Y-Wing"],more:["Y-Wing","A-Wing","B-Wing","HWK-290"]},
-{id:"force",name:"The Force User",desc:"A pilot who has trained in the ways of the Force, using their abilities to enhance their piloting.",start:"Eta-2 Actis",starts:["Eta-2 Actis","Delta-7"],more:["Eta-2 Actis","Delta-7"]}
+{id:"force",name:"The Force User",desc:"A pilot who has trained in the ways of the Force, using their abilities to enhance their piloting.",start:"Eta-2 Actis",starts:["Eta-2 Actis","Delta-7"],more:["Eta-2 Actis","Delta-7"]},
+{id:"scum",name:"Scum and Villainy",desc:"A pilot from the galaxy's underworld: smugglers, pirates and bounty hunters flying cobbled-together fighters.",start:"Z-95 Headhunter",starts:["Z-95 Headhunter","Y-Wing","HWK-290","Mining Guild TIE"],more:["Y-Wing","HWK-290","Mining Guild TIE"],fan:true},
+{id:"resistance",name:"The Resistance",desc:"A fighter pilot of the Resistance, flying the newest generation of Rebel starfighters.",start:"T-70 X-Wing",starts:["T-70 X-Wing","RZ-2 A-Wing"],more:["RZ-2 A-Wing"],fan:true},
+{id:"firstorder",name:"The First Order",desc:"An elite trainee of the First Order who climbs from TIE fighters toward the Silencer.",start:"TIE/fo Fighter",starts:["TIE/fo Fighter","TIE/sf Fighter"],more:["TIE/sf Fighter","TIE/vn Silencer"],fan:true},
+{id:"republic",name:"The Galactic Republic",desc:"A clone-war era pilot of the Republic navy, flying Torrents, Headhunters and Jedi starfighters.",start:"V-19 Torrent",starts:["V-19 Torrent","Clone Z-95 Headhunter","Delta-7"],more:["Clone Z-95 Headhunter","Delta-7"],fan:true}
 ];
 var HC_RANKCOST=[0,0,9,12,15,18];
 var HC_SHIPCOST=5;
@@ -342,7 +355,8 @@ return h("div",{class:"card",style:"cursor:pointer;"+(on?"border-color:var(--acc
 h("h3",{},c.name+(on?" ✔":"")),
 h("div",{style:"font-size:13px"},c.desc),
 h("div",{class:"dim",style:"margin-top:6px"},"Starts in: "+c.start),
-h("div",{class:"dim"},"Additional ships: "+c.more.join(", "))
+h("div",{class:"dim"},"Additional ships: "+c.more.join(", ")),
+c.fan?h("div",{class:"dim",style:"font-size:11px;margin-top:4px"},"Community conversion: ships are unverified"):null
 ]);
 })),
 cls?h("div",{style:"margin:12px 0"},[
@@ -356,7 +370,7 @@ h("div",{class:"dim"},"Starts with "+(HC_STARTXP[n]||10)+" XP")
 ]);
 }))
 ]):h("div",{class:"dim",style:"margin:12px 0"},"Pick a class to see its starting ships."),
-h("div",{class:"note"},"Only two classes are entered so far. Send the other class names, descriptions and ships and they will be added."),
+h("div",{class:"note"},"The Old School and The Force User come from the HotAC 2.07 rules. The other four are community conversions with unverified ship lists; send corrections and they will be fixed."),
 btn("Create pilot",function(){
 if(!cls||!C.ship){alert("Pick a class and a starting ship first");return}
 var p=newPlayer();
