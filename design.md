@@ -142,9 +142,9 @@ Pilots saved before the starting-XP change (0 XP, nothing bought) get their star
 
 The cockpit Store and Upgrades window use the same fallback chain, starting with the cropped art. The first version only tried the exact xws name, which failed for cards with expansion suffixes such as "-battleofyavin".
 
-## 19. Footer links
+## 19. Header links
 
-A footer under every page links to Patreon (https://www.patreon.com/cw/ianmcg, same page the FreeSpace 4x game uses), the website (https://ianmcgo.github.io/website/) and the Cabal Coffers site. It is hidden when printing.
+The header links to Patreon (https://www.patreon.com/cw/ianmcg, same page the FreeSpace 4x game uses), the website (https://ianmcgo.github.io/website/) and the Cabal Coffers site.
 
 ## 20. Visitor log
 
@@ -165,3 +165,7 @@ The Store tab and the upgrades window list only cards the pilot can afford and c
 The browser tab icon is an inline SVG data link in the page head: a dark disc with a goldenrod ring, four wing strokes in an X with cyan engine tips and a red cockpit light. It is an original design, so it needs no extra file.
 
 The page title and header now read X-Wing HotAC Cockpit.
+
+## 24. Top bar layout
+
+The top bar reads, left to right: the title, the edition drop down, then (pushed right) the Support on Patreon, My Website and Cabal Coffers links and the visitor log. There is no footer any more.
