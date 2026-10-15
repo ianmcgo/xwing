@@ -146,11 +146,9 @@ The cockpit Store and Upgrades window use the same fallback chain, starting with
 
 A footer under every page links to Patreon (https://www.patreon.com/cw/ianmcg, same page the FreeSpace 4x game uses), the website (https://ianmcgo.github.io/website/) and the Cabal Coffers site. It is hidden when printing.
 
-## 20. Visit tracker
+## 20. Visitor log
 
-The footer shows total visits, visits today and the last 7 days; click it for the top countries. It uses the FreeSpace 4X Supabase project but its own table, `xwing_visits` (one row per UTC day and country), so X-Wing traffic never touches the FreeSpace counters. Two security-definer functions are exposed: `bump_xwing_visit` (adds one) and `get_xwing_stats` (read only); the table has row level security on and no direct access. A visit counts once per browser per UTC day. The country comes from the `cf-ipcountry` request header; `??` means unknown. The key in the page is the same publishable key FreeSpace 4x already ships.
-
-The star drift no longer reacts to page scrolling; stars move only with time.
+The visitor log panel and the Visitor Origins globe are the same module that runs on the main website (https://ianmcgo.github.io/website/). They count into the same Supabase project as the website, so X-Wing visits are added to the website's totals and appear on its globe. The module is in `visitors/visitors.js` and `visitors/visitors.css`; the panel and globe markup sit at the end of `index.html`. It is configured by `window.VisitorTrackerConfig` (client, storage prefix `xwingcockpit`, and the text on the share card). The panel color follows the `--sc` variable, set to goldenrod. A browser counts once per UTC day. The earlier `xwing_visits` table in the FreeSpace 4X project was removed.
 
 ## 21. Card zoom
 
