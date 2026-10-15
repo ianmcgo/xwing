@@ -37,6 +37,8 @@ A pack provides: ship and pilot catalog, upgrade catalog with slots, points or X
 
 ## 4. Architecture
 
+Current implementation (v0.1): the whole app is a single `index.html` with inline CSS and JavaScript, no build step, opened directly or served from GitHub Pages. It keeps state in localStorage with JSON export and import. The AI random tables from the spreadsheet are embedded (typos normalized). Card data loads at runtime from jsDelivr: xwing-data2 for 2E, 2.5E and XWA, voidstate card images for 1E. Implemented: edition switch, campaign and season tracker, pilot sheets, shot-down handling, Pallas hangar/mothership/unlocks, random AI generator with enemy squadron, card browser with owned-ship filter, settings, export and import. The multi-file layering below is the target if the single file outgrows itself.
+
 - Static single-page app, TypeScript, React, Vite. Hosted on GitHub Pages (matches existing use of GitHub Pages) so no server is required.
 - Layers:
   1. data: normalized JSON per pack plus a build script that ingests xwing-data2, the xlsx, the vmod and hand-transcribed card data into one schema.

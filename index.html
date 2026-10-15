@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>X-Wing HotAC Companion</title>
+<style>
+:root{--bg:#0b0f17;--panel:#131a26;--panel2:#1a2333;--line:#27324a;--text:#e6ecf5;--dim:#8fa0bd;--acc:#ffb84d;--acc2:#4da3ff;--bad:#ff6b6b;--good:#5fd18a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,Segoe UI,Roboto,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+header h1{font-size:18px;margin:0;letter-spacing:.04em;color:var(--acc)}
+header .sp{flex:1}
+nav{display:flex;flex-wrap:wrap;gap:4px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+nav button{background:none;border:1px solid transparent;color:var(--dim);padding:7px 14px;border-radius:6px;cursor:pointer;font:inherit}
+nav button.on{color:var(--bg);background:var(--acc);font-weight:600}
+nav button:hover:not(.on){border-color:var(--line);color:var(--text)}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.card h2,.card h3{margin:0 0 8px;font-size:16px}
+.card h3{color:var(--acc)}
+label{display:block;font-size:12px;color:var(--dim);margin:8px 0 3px;text-transform:uppercase;letter-spacing:.05em}
+input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:7px 9px;border-radius:6px;font:inherit}
+input[type=checkbox]{width:auto}
+button.b{background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:7px 12px;border-radius:6px;cursor:pointer;font:inherit}
+button.b:hover{border-color:var(--acc2)}
+button.p{background:var(--acc);color:var(--bg);border-color:var(--acc);font-weight:600}
+button.d{border-color:var(--bad);color:var(--bad)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row>*{flex:0 0 auto}
+.row .f{flex:1 1 120px}
+.tag{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px;margin:2px}
+.tag button{background:none;border:0;color:var(--dim);cursor:pointer;padding:0}
+.dim{color:var(--dim)}
+.big{font-size:28px;font-weight:700;color:var(--acc)}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}
+th{color:var(--dim);font-weight:500;font-size:12px;text-transform:uppercase}
+tr.hl td{background:rgba(255,184,77,.12)}
+td.hl{background:rgba(255,184,77,.18);font-weight:600}
+.img{width:100%;border-radius:8px;display:block;background:var(--panel2);min-height:80px}
+.note{border-left:3px solid var(--acc2);padding:6px 10px;background:var(--panel2);border-radius:0 6px 6px 0;margin:8px 0;font-size:13px;color:var(--dim)}
+.log{max-height:260px;overflow:auto;font-size:13px}
+.log div{padding:3px 0;border-bottom:1px dashed var(--line)}
+.roll{font-size:40px;font-weight:800;color:var(--acc);font-variant-numeric:tabular-nums}
+.ok{color:var(--good)}.bad{color:var(--bad)}
+@media print{header,nav,button{display:none!important}body{background:#fff;color:#000}.card{border-color:#999;background:#fff}}
+</style>
+</head>
+<body>
+<header>
+<h1>X-WING HotAC COMPANION</h1>
+<span class="dim" id="subtitle"></span>
+<span class="sp"></span>
+<span class="dim">Edition</span>
+<select id="edSel" style="width:auto"></select>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<script>
+(function(){
+var AI_ROWS=[[1, "TIE Interceptor", "1 4 6 8 10", "Stealth Device", "Autothrusters, Predator", "Rexler Brath", "Lone Wolf", "Mauler Mithel"], [2, "TIE Interceptor", "1 4 6 8 10", "Autothrusters", "Shield Upgrade, Push the Limit", "Captain Kagi", "Expert Handling", "Soontir Fel"], [3, "TIE Interceptor", "1 4 6 8 10", "Autothrusters", "Stealth Device, Expert Handling", "Whisper", "Elusiveness", "Dark Curse"], [4, "TIE Interceptor", "1 4 6 8 10", "Hull Upgrade", "Shield Upgrade, Expose", "Targeting Computer", "Opportunist", "Turr Phennir"], [5, "TIE Interceptor", "1 4 6 8 10", "Hull Upgrade", "Autothrusters, Outmaneuver", "Backstabber", "Calculation", "Rear Admiral Chiraneau"], [6, "TIE Interceptor", "1 4 6 8 10", "Stealth Device", "Hull Upgrade, Squad Leader", "Experimental Interface", "Swarm Tactics", "Commander Kenkirk"], [7, "TIE Bomber", "2 3 5 7 9", "Cluster Missile", "Extra Munitions, Marksmanship", "Commander Alozen", "Predator", "Major Rhymer"], [8, "TIE Bomber", "2 3 5 7 9", "Homing Missile", "Extra Munitions, Calculation", "Lieutenant Colzet", "Elusiveness", "Rexler Brath"], [9, "TIE Bomber", "2 3 5 7 9", "Ion Pulse Missile", "Extra Munitions, Swarm Tactics", "Howlrunner", "Outmaneuver", "Dark Curse"], [10, "TIE Bomber", "2 3 5 7 9", "Assault Missile", "Extra Munitions, Outmaneuver", "Redline", "Ruthlessness", "Kir Kanos"], [11, "TIE Bomber", "2 3 5 7 9", "Advanced Proton Torpedo", "Extra Munitions, Shield Upgrade", "Major Rhymer", "Opportunist", "Commander Kenkirk"], [12, "TIE Bomber", "2 3 5 7 9", "Flechette Torpedo", "Extra Munitions, Calculation", "Night Beast", "Predator", "Kath Scarlet"], [13, "TIE Advanced", "2 4 6 8 10", "Advanced Sensors", "Proton Rocket, Intimidation", "Zertik Storm", "Push the Limit", "Mauler Mithel"], [14, "TIE Advanced", "2 4 6 8 10", "Sensor Jammer", "Shield Upgrade, Expert Handling", "Captain Kagi", "Elusiveness", "Carnor Jax"], [15, "TIE Advanced", "2 4 6 8 10", "Accuracy Corrector", "Shield Upgrade, Swarm Tactics", "Colonel Jendon", "Squad Leader", "Howlrunner"], [16, "TIE Advanced", "2 4 6 8 10", "Advanced Targeting Computer", "Stealth Device, Expose", "Experimental Interface", "Whisper", "Opportunist"], [17, "TIE Defender", "1 3 5 7 9", "Ion Cannon", "Shield Upgrade, Outmaneuver", "Backstabber", "Swarm Tactics", "Howlrunner"], [18, "TIE Defender", "1 3 5 7 9", "Flechette Cannon", "Stealth Device, Elusiveness", "Whisper", "Lone Wolf", "Night Beast"], [19, "TIE Defender", "1 3 5 7 9", "Mangler Cannon", "Shield Upgrade, Calculation", "Kath Scarlet", "Ruthlessness", "Rear Admiral Chiraneau"], [20, "TIE Defender", "1 3 5 7 9", "Heavy Laser Cannon", "Hull Upgrade, Push the Limit", "Kir Kanos", "Outmaneuver", "Rexler Brath"], [21, "TIE Phantom", "3 3 5 7 9", "Recon Specialist", "Advanced Cloaking Device, Sensor Jammer", "Lone Wolf", "Elusiveness", "Dark Curse"], [22, "TIE Phantom", "3 3 5 7 9", "Mara Jade", "Advanced Cloaking Device, Sensor Jammer", "Mauler Mithel", "Predator", "Carnor Jax"], [23, "TIE Phantom", "3 3 5 7 9", "Gunner", "Advanced Cloaking Device, Fire Control System", "Backstabber", "Outmaneuver", "Soontir Fel"], [24, "TIE Phantom", "3 3 5 7 9", "Tactician", "Advanced Cloaking Device, Advanced Sensors", "Expose", "Captain Kagi", "Rexler Brath"], [25, "Lambda Shuttle", "2 4 4 6 8", "Sensor Jammer", "Flight Instructor, Draw Their Fire", "Captain Kagi", "Rebel Captive", "Elusiveness"], [26, "Lambda Shuttle", "2 4 4 6 8", "Anti-Pursuit Lasers", "Enhanced Scopes, Mara Jade", "Zertik Strom", "Tactician", "Carnor Jax"], [27, "Lambda Shuttle", "2 4 4 6 8", "Weapons Engineer", "Advanced Sensors, Squad Leader", "Colonel Jendon", "Gunner", "Rexler Brath"], [28, "Lambda Shuttle", "2 4 4 6 8", "Fleet Officer", "Advanced Sensors, Tactical Jammer", "Captain Yorr", "Swarm Tactics", "Howlrunner"]];
+var AI_RANGES=[["TIE Interceptor",1,6],["TIE Bomber",7,12],["TIE Advanced",13,16],["TIE Defender",17,20],["TIE Phantom",21,24],["Lambda Shuttle",25,28]];
+var AI_LEVELS=["Basic","Elite","PS4","PS6","PS8"];
+var EDITIONS={
+"1e":{label:"1st Edition",ps:"Pilot Skill",src:"v1"},
+"2e":{label:"2nd Edition",ps:"Initiative",src:"v2"},
+"2.5e":{label:"2.5 Edition",ps:"Initiative",src:"v2"},
+"xwa":{label:"XWA Edition",ps:"Initiative",src:"v2"}
+};
+var MODULES={
+"hotac":{label:"Heroes of the Aturi Cluster",newShip:null},
+"pallas":{label:"Battlestar Pallas",newShip:5},
+"dote":{label:"Defenders of the Empire",newShip:null},
+"fga":{label:"Flight Group Alpha",newShip:null},
+"omega":{label:"Omega One (FGA expansion)",newShip:null}
+};
+var PALLAS_START=[["X-Wing",5],["Y-Wing",8],["A-Wing",10],["HWK-290",10],["B-Wing",4],["YT-1300",-2],["Attack Shuttle",8],["ARC-170",4],["U-Wing",3],["Scurrgh H-6",1],["Auzituck",1],["B/SF-17",-1]];
+var PALLAS_UNLOCK=[["HWK290 Alliance Overhaul","Season 1","-",10],["A-Wing Mass Production Model","Season 1","-",2],["A-Wing Mark II","Season 2","-",6],["A-Wing Mark III","Season 3","-",16],["T65B X-Wing","Season 1","-",12],["T65AC4 X-Wing","Season 1","-",2],["ACT65 X-Wing","Season 1","-",5],["BTL-S3 Y-Wing","Season 1","-",1],["YT-1300 Combat Refit","Season 1","Special Mission 5",20],["B-Wing B6 Prototype","Season 2","-",6],["T70 X-Wing","Season 2","Special Mission 2",20],["YT-2400","Season 2","Special Mission 6",10],["K-Wing","Season 3","Special Mission 3",25],["E-Wing","Season 3","Special Mission 4",24]];
+var V2_BASE="https://cdn.jsdelivr.net/gh/xwingtmg/xwing-data2@master/";
+var V1_FLAT="https://data.jsdelivr.com/v1/package/gh/voidstate/xwing-card-images@master/flat";
+var V1_BASE="https://cdn.jsdelivr.net/gh/voidstate/xwing-card-images@master";
+var KEY="xwing-hotac-companion-v1";
+
+function blank(){return {edition:"2e",module:"hotac",hardcore:false,season:1,mission:1,pool:0,players:[],hangar:[],unlocked:[],pallas:{hull:0,energy:0,shields:0,tubes:0},owned:{},log:[],squad:[],tab:"campaign"}}
+var S;
+try{S=Object.assign(blank(),JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){S=blank()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function log(t){S.log.unshift(new Date().toLocaleTimeString()+"  "+t);if(S.log.length>200)S.log.length=200}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function h(tag,attrs,kids){
+var el=document.createElement(tag);
+for(var k in (attrs||{})){
+var v=attrs[k];
+if(k==="class")el.className=v;
+else if(k.indexOf("on")===0)el.addEventListener(k.slice(2),v);
+else if(k==="value")el.value=v;
+else if(k==="checked")el.checked=!!v;
+else if(v!==false&&v!=null)el.setAttribute(k,v);
+}
+[].concat(kids==null?[]:kids).forEach(function(c){if(c==null||c===false)return;el.appendChild(typeof c==="object"?c:document.createTextNode(String(c)))});
+return el;
+}
+function btn(t,fn,cls){return h("button",{class:"b "+(cls||""),onclick:fn,type:"button"},t)}
+function field(lbl,input){return h("div",{},[h("label",{},lbl),input])}
+function sel(opts,val,fn){
+var s=h("select",{onchange:function(){fn(s.value)}},opts.map(function(o){var v=Array.isArray(o)?o[0]:o,l=Array.isArray(o)?o[1]:o;return h("option",{value:v},l)}));
+s.value=val;return s;
+}
+function txt(val,fn,type){var i=h("input",{type:type||"text",value:val,onchange:function(){fn(type==="number"?Number(i.value):i.value)}});return i}
+function rr(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function ed(){return EDITIONS[S.edition]}
+function refresh(){save();render()}
+
+function tagList(arr,onrm,onadd,ph){
+var wrap=h("div",{});
+arr.forEach(function(t,i){wrap.appendChild(h("span",{class:"tag"},[t,h("button",{onclick:function(){onrm(i)},title:"remove",type:"button"},"×")]))});
+var inp=h("input",{placeholder:ph||"add…",style:"margin-top:6px",onkeydown:function(e){if(e.key==="Enter"&&inp.value.trim()){onadd(inp.value.trim())}}});
+wrap.appendChild(inp);return wrap;
+}
+
+function playerCard(p,i){
+var shipOpts=S.module==="pallas"?PALLAS_START.map(function(x){return x[0]}):[];
+var dl=null;
+var shipInput=txt(p.ship,function(v){p.ship=v;refresh()});
+if(shipOpts.length){shipInput.setAttribute("list","ships_dl");dl=h("datalist",{id:"ships_dl"},shipOpts.map(function(o){return h("option",{value:o})}))}
+return h("div",{class:"card"},[
+h("div",{class:"row"},[h("h3",{class:"f"},p.name||("Pilot "+(i+1))),btn("Remove",function(){if(confirm("Remove this pilot?")){S.players.splice(i,1);log("Removed pilot "+(p.name||i+1));refresh()}},"d")]),
+field("Callsign / name",txt(p.name,function(v){p.name=v;refresh()})),
+field("Ship",shipInput),dl,
+h("div",{class:"row"},[
+h("div",{class:"f"},field(ed().ps,txt(p.ps,function(v){p.ps=v;refresh()},"number"))),
+h("div",{class:"f"},field("XP",txt(p.xp,function(v){p.xp=v;refresh()},"number"))),
+h("div",{class:"f"},field("Kills",txt(p.kills,function(v){p.kills=v;refresh()},"number")))
+]),
+h("div",{class:"row",style:"margin-top:8px"},[
+btn("+1 XP",function(){p.xp++;log((p.name||"Pilot")+" +1 XP");refresh()}),
+btn("−1 XP",function(){p.xp--;refresh()}),
+btn("+1 Kill",function(){p.kills++;log((p.name||"Pilot")+" kill");refresh()}),
+btn("Shot down",function(){
+var c=MODULES[S.module].newShip;
+if(c!=null){
+if(p.xp>=c){p.xp-=c;log((p.name||"Pilot")+" shot down, replacement ship −"+c+" XP")}
+else{p.xp-=1;p.ship="Z-95 Headhunter";log((p.name||"Pilot")+" shot down, rejoined in Z-95 (−1 XP)")}
+}else{log((p.name||"Pilot")+" shot down")}
+refresh()},"d")
+]),
+field("Upgrades",tagList(p.upgrades,function(k){p.upgrades.splice(k,1);refresh()},function(v){p.upgrades.push(v);refresh()},"upgrade, Enter")),
+field("Elite talents / titles",tagList(p.talents,function(k){p.talents.splice(k,1);refresh()},function(v){p.talents.push(v);refresh()},"talent, Enter")),
+field("Notes",h("textarea",{rows:2,onchange:function(e){p.notes=e.target.value;save()}},p.notes||""))
+]);
+}
+function newPlayer(){
+var start=0,ship="";
+return {name:"",ship:ship,ps:S.module==="pallas"?2:1,xp:start,kills:0,upgrades:[],talents:[],notes:""};
+}
+
+function viewCampaign(){
+var m=MODULES[S.module];
+var a=h("div",{class:"card"},[
+h("h2",{},"Campaign"),
+field("Edition",sel(Object.keys(EDITIONS).map(function(k){return[k,EDITIONS[k].label]}),S.edition,function(v){S.edition=v;log("Edition: "+EDITIONS[v].label);refresh()})),
+field("Campaign module",sel(Object.keys(MODULES).map(function(k){return[k,MODULES[k].label]}),S.module,function(v){S.module=v;log("Module: "+MODULES[v].label);refresh()})),
+h("div",{class:"row"},[
+h("div",{class:"f"},field("Season",txt(S.season,function(v){S.season=v;refresh()},"number"))),
+h("div",{class:"f"},field("Mission",txt(S.mission,function(v){S.mission=v;refresh()},"number"))),
+h("div",{class:"f"},field("Shared XP pool",txt(S.pool,function(v){S.pool=v;refresh()},"number")))
+]),
+h("label",{style:"display:flex;gap:8px;align-items:center;text-transform:none;font-size:14px;color:var(--text)"},[h("input",{type:"checkbox",checked:S.hardcore,onchange:function(e){S.hardcore=e.target.checked;log("Hardcore: "+S.hardcore);refresh()}}),"Hardcore mode"]),
+h("div",{class:"row",style:"margin-top:10px"},[
+btn("Mission complete (next mission)",function(){log("Mission "+S.mission+" complete (season "+S.season+")");S.mission++;refresh()},"p"),
+btn("Next season",function(){S.season++;S.mission=1;log("Season "+S.season+" begins");refresh()})
+]),
+S.edition==="xwa"?h("div",{class:"note"},"XWA edition rules are not yet defined; it currently uses 2nd edition data and a placeholder ruleset."):null,
+S.edition==="2.5e"?h("div",{class:"note"},"2.5 uses current xwing-data2 points and errata."):null
+]);
+var b=h("div",{class:"card"},[
+h("h2",{},"Squadron"),
+h("div",{class:"big"},S.players.length+" pilot"+(S.players.length===1?"":"s")),
+h("div",{class:"dim"},"Total XP held: "+S.players.reduce(function(s,p){return s+p.xp},0)+"  ·  Pool: "+S.pool),
+h("div",{class:"row",style:"margin-top:10px"},[
+btn("Add pilot",function(){if(S.players.length>=4&&!confirm("More than 4 pilots. Add anyway?"))return;S.players.push(newPlayer());log("Pilot added");S.tab="pilots";refresh()},"p"),
+S.module==="pallas"?btn("Add pilot with starting XP…",function(){
+var n=prompt("Ship ("+PALLAS_START.map(function(x){return x[0]}).join(", ")+")");
+if(!n)return;
+var f=PALLAS_START.filter(function(x){return x[0].toLowerCase()===n.toLowerCase()})[0];
+if(!f){alert("Unknown ship");return}
+var p=newPlayer();p.ship=f[0];p.xp=f[1];S.players.push(p);log("Pilot added in "+f[0]+" with "+f[1]+" XP");refresh()}):null
+]),
+S.module==="pallas"?h("div",{class:"note"},"Pallas: every ship starts at PS 2. New ships cost 5 XP. Below 5 XP, rejoin in a Z-95 and lose 1 XP (XP can go negative)."):null
+]);
+var c=h("div",{class:"card"},[h("h2",{},"Log"),h("div",{class:"log"},S.log.map(function(l){return h("div",{},l)})),h("div",{class:"row",style:"margin-top:8px"},[btn("Add note",function(){var t=prompt("Log note");if(t){log(t);refresh()}}),btn("Clear log",function(){S.log=[];refresh()})])]);
+return h("div",{class:"grid g2"},[a,b,c]);
+}
+function viewPilots(){
+var kids=S.players.map(playerCard);
+if(!kids.length)kids=[h("div",{class:"card"},[h("p",{},"No pilots yet."),btn("Add pilot",function(){S.players.push(newPlayer());refresh()},"p")])];
+else kids.push(h("div",{class:"card"},btn("Add pilot",function(){S.players.push(newPlayer());refresh()},"p")));
+return h("div",{class:"grid g3"},kids);
+}
+function viewHangar(){
+var items=h("div",{class:"card"},[
+h("h2",{},"Hangar"),
+h("div",{class:"dim"},"Shared pool of spare ships and purchased upgrades."),
+tagList(S.hangar,function(k){S.hangar.splice(k,1);refresh()},function(v){S.hangar.push(v);log("Hangar + "+v);refresh()},"ship or upgrade, Enter")
+]);
+var out=[items];
+if(S.module==="pallas"){
+var P=S.pallas;
+function cost(kind,n){return kind==="shields"?n+3:n+2}
+function buyRow(kind,label){
+var n=P[kind];
+return h("tr",{},[h("td",{},label),h("td",{},n),h("td",{},cost(kind,n)+" XP"),h("td",{},[btn("Buy",function(){var c=cost(kind,n);if(S.pool<c){alert("Not enough XP in pool");return}S.pool-=c;P[kind]++;log("Pallas +1 "+kind+" (−"+c+" XP)");refresh()}),btn("Refund",function(){if(!P[kind])return;var c=cost(kind,P[kind]-1);if(S.hardcore)c=Math.ceil(c/2);S.pool+=c;P[kind]--;log("Pallas refunded "+kind+" (+"+c+" XP)");refresh()})])]);
+}
+out.push(h("div",{class:"card"},[
+h("h2",{},"Gozanti “Pallas”"),
+h("div",{class:"dim"},"Pool XP: "+S.pool+"  ·  Hull and energy start at 2 XP, shields at 3 XP, each further point costs 1 more."),
+h("table",{},[h("tr",{},[h("th",{},"Stat"),h("th",{},"Bought"),h("th",{},"Next cost"),h("th",{},"")]),buyRow("hull","Hull"),buyRow("energy","Energy"),buyRow("shields","Shields")]),
+h("div",{class:"row",style:"margin-top:8px"},[
+h("span",{},"Ordnance tubes: "+P.tubes),
+btn("Buy tube (5 XP)",function(){if(S.pool<5){alert("Not enough XP in pool");return}S.pool-=5;P.tubes++;log("Pallas ordnance tube (−5 XP)");refresh()})
+]),
+h("div",{class:"note"},"Pallas PS equals the players' average PS, rounded up: "+(S.players.length?Math.ceil(S.players.reduce(function(s,p){return s+Number(p.ps||0)},0)/S.players.length):"n/a"))
+]));
+out.push(h("div",{class:"card"},[
+h("h2",{},"Ship unlocks"),
+h("table",{},[h("tr",{},["Ship","Available","Prerequisite","Cost",""].map(function(x){return h("th",{},x)}))].concat(PALLAS_UNLOCK.map(function(u){
+var done=S.unlocked.indexOf(u[0])>=0;
+return h("tr",{class:done?"hl":""},[h("td",{},u[0]),h("td",{},u[1]),h("td",{},u[2]),h("td",{},u[3]+" XP"),h("td",{},done?h("span",{class:"ok"},"Unlocked"):btn("Unlock",function(){if(S.pool<u[3]){alert("Not enough XP in pool");return}S.pool-=u[3];S.unlocked.push(u[0]);log("Unlocked "+u[0]+" (−"+u[3]+" XP)");refresh()}))]);
+})))
+]));
+}
+return h("div",{class:"grid g2"},out);
+}
+
+function aiGen(ship,level){
+var lo,hi;
+AI_RANGES.forEach(function(r){if(r[0]===ship){lo=r[1];hi=r[2]}});
+var roll=ship==="Any"?rr(1,28):rr(lo,hi);
+var row=AI_ROWS.filter(function(r){return r[0]===roll})[0];
+return {roll:roll,row:row,level:level};
+}
+function aiPS(row,level){var p=String(row[2]).split(" ");return p[AI_LEVELS.indexOf(level)]}
+var AI={ship:"Any",level:"Elite",cur:null,hist:[]};
+function ownedShips(){
+var names=AI_RANGES.map(function(r){return r[0]});
+var o=names.filter(function(n){return S.owned[n]});
+return o.length?o:names;
+}
+function aiFiltered(ship,level){
+if(ship!=="Any")return aiGen(ship,level);
+var ok=ownedShips(),tries=0,g;
+do{g=aiGen("Any",level);tries++}while(ok.indexOf(g.row[1])<0&&tries<200);
+return g;
+}
+function aiResult(g){
+if(!g)return h("div",{class:"dim"},"Roll to draw an AI ship.");
+var r=g.row;
+var cols=[["PS","ps"],["Basic",3],["Elite",4],["PS4",5],["PS6",6],["PS8",7]];
+var lvlCol={Basic:3,Elite:4,PS4:5,PS6:6,PS8:7}[g.level];
+return h("div",{},[
+h("div",{class:"row"},[h("div",{class:"roll"},g.roll),h("div",{},[h("div",{class:"big",style:"font-size:22px"},r[1]),h("div",{class:"dim"},"Level "+g.level+"  ·  PS "+aiPS(r,g.level))])]),
+h("table",{},[h("tr",{},["Basic","Elite","PS4","PS6","PS8"].map(function(x){return h("th",{},x)})),h("tr",{},[3,4,5,6,7].map(function(c,i){return h("td",{class:c===lvlCol?"hl":""},r[c])})),h("tr",{},String(r[2]).split(" ").map(function(x){return h("td",{class:"dim"},"PS "+x)}))])
+]);
+}
+function viewAI(){
+var shipOpts=[["Any","Any (d28)"]].concat(AI_RANGES.map(function(r){return[r[0],r[0]+" ("+r[1]+"-"+r[2]+")"]}));
+var out=h("div",{id:"aiout"},[aiResult(AI.cur)]);
+var left=h("div",{class:"card"},[
+h("h2",{},"Random AI ship"),
+field("Ship",sel(shipOpts,AI.ship,function(v){AI.ship=v})),
+field("AI level",sel(AI_LEVELS,AI.level,function(v){AI.level=v;if(AI.cur){AI.cur.level=v;render()}})),
+h("div",{class:"row",style:"margin:10px 0"},[
+btn("Roll",function(){AI.cur=aiFiltered(AI.ship,AI.level);AI.hist.unshift(AI.cur);if(AI.hist.length>30)AI.hist.pop();render()},"p"),
+btn("Add to squadron",function(){if(!AI.cur)return;var r=AI.cur.row;S.squad.push({ship:r[1],level:AI.cur.level,ps:aiPS(r,AI.cur.level),roll:AI.cur.roll,basic:r[3],elite:r[4],named:r[{Basic:3,Elite:4,PS4:5,PS6:6,PS8:7}[AI.cur.level]]});log("AI added: "+r[1]+" "+AI.cur.level);refresh()})
+]),
+out,
+h("div",{class:"note"},"Based on the HotAC AI Ship Random Generator v0.5 tables (28 loadouts). Ship choice uses the owned ships set in Settings; if none is ticked, all are used.")
+]);
+var sq=h("div",{class:"card"},[
+h("h2",{},"Enemy squadron ("+S.squad.length+")"),
+S.squad.length?h("table",{},[h("tr",{},["Ship","Lvl","PS","Loadout",""].map(function(x){return h("th",{},x)}))].concat(S.squad.map(function(s,i){
+return h("tr",{},[h("td",{},s.ship),h("td",{},s.level),h("td",{},s.ps),h("td",{},[s.level==="Basic"?s.basic:s.level==="Elite"?s.elite:s.named+" — "+s.basic+"; "+s.elite]),h("td",{},btn("×",function(){S.squad.splice(i,1);refresh()}))]);
+}))):h("div",{class:"dim"},"Empty."),
+h("div",{class:"row",style:"margin-top:8px"},[btn("Clear squadron",function(){S.squad=[];refresh()})])
+]);
+var hist=h("div",{class:"card"},[h("h2",{},"Roll history"),h("div",{class:"log"},AI.hist.map(function(g){return h("div",{},g.roll+"  "+g.row[1]+"  ("+g.level+", PS "+aiPS(g.row,g.level)+")")}))]);
+var tbl=h("div",{class:"card",style:"grid-column:1/-1"},[
+h("h2",{},"Full table"),
+h("div",{style:"overflow:auto"},h("table",{},[h("tr",{},["#","Ship","PS (Basic/Elite/PS4/PS6/PS8)","Basic","Elite","PS4","PS6","PS8"].map(function(x){return h("th",{},x)}))].concat(AI_ROWS.map(function(r){
+return h("tr",{class:AI.cur&&AI.cur.roll===r[0]?"hl":""},r.map(function(c){return h("td",{},c)}));
+}))))
+]);
+return h("div",{class:"grid g2"},[left,sq,hist,tbl]);
+}
+
+var DATA={v2manifest:null,v2ships:{},v1files:null,err:null,loading:false};
+var BR={q:"",faction:"rebelalliance",ship:null,ownedOnly:false};
+function fetchJSON(u){return fetch(u).then(function(r){if(!r.ok)throw new Error(r.status+" "+u);return r.json()})}
+function loadV2Manifest(){
+if(DATA.v2manifest||DATA.loading||DATA.err)return;
+DATA.loading=true;
+fetchJSON(V2_BASE+"data/manifest.json").then(function(m){DATA.v2manifest=m;DATA.loading=false;render()}).catch(function(e){DATA.err=String(e.message||e);DATA.loading=false;render()});
+}
+function loadShip(path){
+if(DATA.v2ships[path])return;
+DATA.v2ships[path]="loading";
+fetchJSON(V2_BASE+path).then(function(d){DATA.v2ships[path]=d;render()}).catch(function(e){DATA.v2ships[path]={error:String(e.message||e)};render()});
+}
+function loadV1(){
+if(DATA.v1files||DATA.loading||DATA.err)return;
+DATA.loading=true;
+fetchJSON(V1_FLAT).then(function(d){DATA.v1files=d.files.map(function(f){return f.name}).filter(function(n){return/\.(png|jpg)$/i.test(n)});DATA.loading=false;render()}).catch(function(e){DATA.err=String(e.message||e);DATA.loading=false;render()});
+}
+function shipBase(p){return p.split("/").pop().replace(".json","")}
+function viewBrowser(){
+var out=[];
+var top=h("div",{class:"card"},[
+h("div",{class:"row"},[
+h("div",{class:"f"},field("Search",txt(BR.q,function(v){BR.q=v;render()}))),
+h("label",{style:"display:flex;gap:6px;align-items:center;text-transform:none;font-size:14px;color:var(--text)"},[h("input",{type:"checkbox",checked:BR.ownedOnly,onchange:function(e){BR.ownedOnly=e.target.checked;render()}}),"Owned ships only"]),
+btn("Retry load",function(){DATA.err=null;render()})
+]),
+DATA.err?h("div",{class:"note bad"},"Could not load card data ("+esc(DATA.err)+"). Check your connection; the rest of the app works offline."):null
+]);
+out.push(top);
+if(ed().src==="v1"){
+loadV1();
+if(!DATA.v1files)return h("div",{},[top,h("div",{class:"card"},DATA.err?"":"Loading 1st edition card list…")]);
+var q=BR.q.toLowerCase();
+var files=DATA.v1files.filter(function(f){return!q||f.toLowerCase().indexOf(q)>=0}).slice(0,120);
+out.push(h("div",{class:"dim"},files.length+" shown (max 120)"));
+out.push(h("div",{class:"grid g3"},files.map(function(f){
+var path=f.replace(/^\//,"");
+return h("div",{class:"card"},[h("img",{class:"img",loading:"lazy",src:V1_BASE+"/"+path,alt:path}),h("div",{class:"dim",style:"font-size:12px;margin-top:6px"},path.replace(/^images\//,""))]);
+})));
+return h("div",{},out);
+}
+loadV2Manifest();
+if(!DATA.v2manifest)return h("div",{},[top,h("div",{class:"card"},DATA.err?"":"Loading card data…")]);
+var factions=DATA.v2manifest.pilots.map(function(p){return p.faction});
+var fsel=h("div",{class:"card"},[field("Faction",sel(factions,BR.faction,function(v){BR.faction=v;BR.ship=null;render()}))]);
+out.push(fsel);
+var f=DATA.v2manifest.pilots.filter(function(p){return p.faction===BR.faction})[0];
+var ships=f?f.ships:[];
+var q2=BR.q.toLowerCase();
+var shown=ships.filter(function(p){var n=shipBase(p);return(!q2||n.indexOf(q2.replace(/\s+/g,"-"))>=0)&&(!BR.ownedOnly||S.owned[n])});
+out.push(h("div",{class:"card"},[h("h3",{},"Ships"),h("div",{},shown.map(function(p){
+var n=shipBase(p);
+return h("span",{class:"tag",style:BR.ship===p?"border-color:var(--acc)":""},[
+h("button",{onclick:function(){BR.ship=p;loadShip(p);render()},style:"color:var(--text)",type:"button"},n),
+h("button",{title:"toggle owned",onclick:function(){S.owned[n]=!S.owned[n];refresh()},style:S.owned[n]?"color:var(--good)":"",type:"button"},S.owned[n]?"✔":"○")
+]);
+}))]));
+if(BR.ship){
+var d=DATA.v2ships[BR.ship];
+if(!d||d==="loading")out.push(h("div",{class:"card"},"Loading ship…"));
+else if(d.error)out.push(h("div",{class:"card bad"},"Failed: "+esc(d.error)));
+else{
+out.push(h("div",{class:"card"},[h("h2",{},d.name),h("div",{class:"dim"},"Size "+d.size+"  ·  Stats: "+(d.stats||[]).map(function(s){return s.type+" "+s.value}).join(", ")+"  ·  Actions: "+(d.actions||[]).map(function(a){return a.type}).join(", "))]));
+out.push(h("div",{class:"grid g3"},d.pilots.map(function(p){
+return h("div",{class:"card"},[
+p.image?h("img",{class:"img",loading:"lazy",src:p.image,alt:p.name}):null,
+h("h3",{style:"margin-top:8px"},p.name+(p.caption?" — "+p.caption:"")),
+h("div",{class:"dim"},"Initiative "+p.initiative+"  ·  "+(p.cost!=null?p.cost+" pts":"")+(p.limited?"  ·  limited "+p.limited:"")),
+p.ability?h("div",{style:"font-size:13px;margin-top:6px"},p.ability):null,
+h("div",{class:"row",style:"margin-top:8px"},[btn("Use as enemy",function(){S.squad.push({ship:d.name,level:p.name,ps:p.initiative,roll:"-",basic:"",elite:"",named:p.name});log("Enemy added: "+p.name);refresh()}),btn("Add as pilot",function(){var pl=newPlayer();pl.name=p.name;pl.ship=d.name;pl.ps=p.initiative;S.players.push(pl);log("Pilot added: "+p.name);refresh()})])
+]);
+})));
+}
+}
+return h("div",{},out);
+}
+
+function viewSettings(){
+var owned=AI_RANGES.map(function(r){return r[0]});
+var a=h("div",{class:"card"},[
+h("h2",{},"Owned ships (AI generator)"),
+h("div",{class:"dim"},"Tick the enemy ships you own. Random rolls on “Any” only use ticked ships."),
+h("div",{style:"margin-top:8px"},owned.map(function(n){return h("label",{style:"display:flex;gap:8px;align-items:center;text-transform:none;font-size:14px;color:var(--text)"},[h("input",{type:"checkbox",checked:!!S.owned[n],onchange:function(e){S.owned[n]=e.target.checked;refresh()}}),n])}))
+]);
+var b=h("div",{class:"card"},[
+h("h2",{},"Data"),
+h("div",{class:"row"},[
+btn("Export JSON",function(){
+var blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+var u=URL.createObjectURL(blob);var an=h("a",{href:u,download:"xwing-campaign.json"});document.body.appendChild(an);an.click();an.remove();URL.revokeObjectURL(u);
+},"p"),
+h("label",{class:"b",style:"cursor:pointer;margin:0;text-transform:none;color:var(--text);padding:7px 12px;border:1px solid var(--line);border-radius:6px"},["Import JSON",h("input",{type:"file",accept:".json",style:"display:none",onchange:function(e){
+var f=e.target.files[0];if(!f)return;
+var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);S=Object.assign(blank(),d);log("Imported campaign");refresh()}catch(x){alert("Invalid file")}};r.readAsText(f);
+}})]),
+btn("Print",function(){window.print()}),
+btn("Reset everything",function(){if(confirm("Delete the whole campaign?")){S=blank();refresh()}},"d")
+]),
+h("div",{class:"note"},"Campaign data is stored in this browser (localStorage). Export a JSON file to back up or move devices.")
+]);
+var c=h("div",{class:"card"},[
+h("h2",{},"Sources"),
+h("div",{class:"dim"},"2E / 2.5E / XWA card data: xwing-data2 (MIT). 1E card images: voidstate/xwing-card-images. AI random tables: HotAC AI Ship Random Generator v0.5. Campaign rules: Heroes of the Aturi Cluster by Josh Derksen and community modules. Unofficial fan tool, not affiliated with or endorsed by Fantasy Flight Games, Atomic Mass Games or Lucasfilm.")
+]);
+return h("div",{class:"grid g2"},[a,b,c]);
+}
+
+var TABS=[["campaign","Campaign",viewCampaign],["pilots","Pilots",viewPilots],["hangar","Hangar",viewHangar],["ai","AI Ships",viewAI],["browser","Cards",viewBrowser],["settings","Settings",viewSettings]];
+function render(){
+var sub=document.getElementById("subtitle");
+sub.textContent=MODULES[S.module].label+" · Season "+S.season+" · Mission "+S.mission;
+var es=document.getElementById("edSel");
+if(!es.options.length){Object.keys(EDITIONS).forEach(function(k){es.appendChild(h("option",{value:k},EDITIONS[k].label))});es.addEventListener("change",function(){S.edition=es.value;log("Edition: "+EDITIONS[S.edition].label);refresh()})}
+es.value=S.edition;
+var nav=document.getElementById("nav");nav.innerHTML="";
+TABS.forEach(function(t){nav.appendChild(h("button",{class:S.tab===t[0]?"on":"",onclick:function(){S.tab=t[0];refresh()},type:"button"},t[1]))});
+var main=document.getElementById("main");main.innerHTML="";
+var t=TABS.filter(function(x){return x[0]===S.tab})[0]||TABS[0];
+main.appendChild(t[2]());
+}
+render();
+})();
+</script>
+</body>
+</html>
