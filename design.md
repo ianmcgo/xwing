@@ -145,3 +145,9 @@ The cockpit Store and Upgrades window use the same fallback chain, starting with
 ## 19. Footer links
 
 A footer under every page links to Patreon (https://www.patreon.com/cw/ianmcg, same page the FreeSpace 4x game uses), the FreeSpace 4x game, the Cabal Coffers site and the YouTube channel. It is hidden when printing.
+
+## 20. Visit tracker
+
+The footer shows total visits, visits today and the last 7 days; click it for the top countries. It uses the FreeSpace 4X Supabase project but its own table, `xwing_visits` (one row per UTC day and country), so X-Wing traffic never touches the FreeSpace counters. Two security-definer functions are exposed: `bump_xwing_visit` (adds one) and `get_xwing_stats` (read only); the table has row level security on and no direct access. A visit counts once per browser per UTC day. The country comes from the `cf-ipcountry` request header; `??` means unknown. The key in the page is the same publishable key FreeSpace 4x already ships.
+
+The star drift no longer reacts to page scrolling; stars move only with time.
