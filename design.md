@@ -121,3 +121,7 @@ Known gaps: only two classes are entered (The Old School, The Force User); the o
 ## 15. Card art from project-goldenrod
 
 CrazyVulcan/x-wing2.0-project-goldenrod holds images only (no card text): full cards in `src/images/En/pilots` and `En/upgrades`, cropped art in `Art/pilots` and `Art/upgrades`, all named by xws id. The cockpit Store uses `Art/upgrades/<xws>.jpg` from raw.githubusercontent.com, and the XWA online ship browser falls back to `En/pilots/<xws>.png` when the original image fails. Card text and costs still come from xwing-data2. Live image loading from the browser is untested from the build sandbox.
+
+## 16. Starfield
+
+A fixed canvas behind the page draws drifting, twinkling stars that also shift slightly as you scroll. Cards and the header sit above it. It stays still when the system asks for reduced motion and is hidden when printing.
