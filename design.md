@@ -148,7 +148,9 @@ A footer under every page links to Patreon (https://www.patreon.com/cw/ianmcg, s
 
 ## 20. Visitor log
 
-The visitor log panel and the Visitor Origins globe are the same module that runs on the main website (https://ianmcgo.github.io/website/). They count into the same Supabase project as the website, so X-Wing visits are added to the website's totals and appear on its globe. The module is in `visitors/visitors.js` and `visitors/visitors.css`; the panel and globe markup sit at the end of `index.html`. It is configured by `window.VisitorTrackerConfig` (client, storage prefix `xwingcockpit`, and the text on the share card). The panel color follows the `--sc` variable, set to goldenrod. A browser counts once per UTC day. The earlier `xwing_visits` table and its two functions in the FreeSpace 4X project are no longer used and can be dropped.
+The visitor log panel and the Visitor Origins globe use the same module as the main website (https://ianmcgo.github.io/website/), copied into `visitors/visitors.js` and `visitors/visitors.css`. The panel and globe markup sit at the end of `index.html`, and `window.VisitorTrackerConfig` sets the client, the storage prefix `xwingcockpit` and the share card text.
+
+The counts are for this app only. They are stored in the FreeSpace 4X Supabase project in two tables of their own, `xw_visit` (one row per visit, with its country) and `xw_device` (visits per day and device kind), so nothing mixes with the website or the FreeSpace game counters. The module's calls were renamed to match: `xw_bump_site_views`, `xw_get_site_views`, `xw_bump_site_view_device`, `xw_get_country_views`, `xw_get_daily_views`, `xw_get_country_firsts`, `xw_get_country_daily`, `xw_get_hour_views`, `xw_my_country` and `xw_get_device_views`. All are security-definer functions; the tables have row level security on and no direct access. The country comes from the `cf-ipcountry` request header, and `ZZ` means unknown (the moon on the globe). A browser counts once per UTC day. The older `xwing_visits` table and its two functions are unused and can be dropped.
 
 ## 21. Card zoom
 

@@ -90,7 +90,7 @@
         }
 
         function vcSendDevice(c) {
-            try { Promise.resolve(c.rpc('bump_site_view_device', { p_device: vcDeviceKind() })).catch(() => { }); } catch (e) { }
+            try { Promise.resolve(c.rpc('xw_bump_site_view_device', { p_device: vcDeviceKind() })).catch(() => { }); } catch (e) { }
         }
 
         async function vcTick(force) {
@@ -106,7 +106,7 @@
             vcBusy = true;
             vcLastTry = now;
             try {
-                const r = await c.rpc(counted ? 'get_site_views' : 'bump_site_views');
+                const r = await c.rpc(counted ? 'xw_get_site_views' : 'xw_bump_site_views');
                 if (r.error || r.data == null || !isFinite(Number(r.data))) throw r.error || new Error('no count');
                 const n = Number(r.data);
                 if (!counted) {
@@ -2091,9 +2091,9 @@
             if (Date.now() - vgData.fetched < 45000 && vgData.ok) return;
             if (!quiet) vgMsg('LINKING…', true);
             try {
-                const calls = [c.rpc('get_country_views'), c.rpc('get_daily_views', { n: 365 }), c.rpc('get_country_firsts'), c.rpc('get_country_daily', { n: 60 }), c.rpc('get_hour_views')];
-                if (vgMyCountry === null) calls.push(c.rpc('my_country'));
-                const pair = await Promise.all([Promise.all(calls), Promise.resolve(c.rpc('get_device_views', { n: 90 })).catch(() => null)]);
+                const calls = [c.rpc('xw_get_country_views'), c.rpc('xw_get_daily_views', { n: 365 }), c.rpc('xw_get_country_firsts'), c.rpc('xw_get_country_daily', { n: 60 }), c.rpc('xw_get_hour_views')];
+                if (vgMyCountry === null) calls.push(c.rpc('xw_my_country'));
+                const pair = await Promise.all([Promise.all(calls), Promise.resolve(c.rpc('xw_get_device_views', { n: 90 })).catch(() => null)]);
                 const res = pair[0];
                 const dv = pair[1];
                 vgData.dev = dv && !dv.error && Array.isArray(dv.data) ? dv.data.map(r => ({ day: String(r.day).slice(0, 10), device: String(r.device), views: Number(r.views) || 0 })) : vgData.dev || null;
