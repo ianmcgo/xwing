@@ -834,7 +834,7 @@ h("div",{class:"row"},[h("div",{class:"roll"},g.roll),h("div",{},[h("div",{class
 h("table",{},[h("tr",{},["Basic","Elite","PS4","PS6","PS8"].map(function(x){return h("th",{},x)})),h("tr",{},[3,4,5,6,7].map(function(c,i){return h("td",{class:c===lvlCol?"hl":""},r[c])})),h("tr",{},String(r[2]).split(" ").map(function(x){return h("td",{class:"dim"},"PS "+x)}))])
 ]);
 }
-function viewAI(){
+function viewAIRoll(){
 var shipOpts=[["Any","Any (d28)"]].concat(AI_RANGES.map(function(r){return[r[0],r[0]+" ("+r[1]+"-"+r[2]+")"]}));
 var out=h("div",{id:"aiout"},[aiResult(AI.cur)]);
 var left=h("div",{class:"card"},[
@@ -865,6 +865,47 @@ return h("tr",{class:AI.cur&&AI.cur.roll===r[0]?"hl":""},r.map(function(c){retur
 return h("div",{class:"grid g2"},[left,sq,hist,tbl]);
 }
 
+function aiChips(txt){
+if(!txt)return h("span",{class:"dim"},"none");
+return h("span",{},String(txt).split(/,\s*/).map(function(n){
+var c=hcMap()[n];
+var el=h("span",{class:"tag",style:"margin:2px 4px 2px 0;display:inline-block"+(c?";cursor:pointer":""),title:c?c.text:""},n+(c?" ("+ckPrice(c)+")":""));
+if(c)el.addEventListener("click",function(){cardZoom(c)});
+return el;
+}));
+}
+function aiCardFor(r){
+var ps=String(r[2]).split(" ");
+var lv=[["Basic",r[3],ps[0]],["Elite",r[4],ps[1]]];
+var named=[["PS "+ps[2],r[5],""],["PS "+ps[3],r[6],""],["PS "+ps[4],r[7],""]];
+return h("div",{class:"card"},[
+h("div",{class:"row",style:"align-items:center"},[h("div",{class:"roll"},r[0]),h("b",{class:"f",style:"font-size:17px"},r[1])]),
+h("table",{style:"width:100%"},[h("tr",{},["Level","PS","Upgrades"].map(function(x){return h("th",{},x)}))].concat(lv.map(function(x){return h("tr",{},[h("td",{},x[0]),h("td",{},x[2]),h("td",{},aiChips(x[1]))])}))),
+h("div",{class:"dim",style:"margin:8px 0 4px"},"Named pilots (levels PS4, PS6, PS8)"),
+h("table",{style:"width:100%"},named.map(function(x){return h("tr",{},[h("td",{},x[0]),h("td",{},x[1])])}))
+]);
+}
+function viewAICards(){
+var ships=AI_RANGES.map(function(r){return r[0]});
+AI.cs=AI.cs||ships[0];
+var rows=AI_ROWS.filter(function(r){return AI.cs==="All"||r[1]===AI.cs});
+return h("div",{},[
+h("div",{class:"card"},[
+h("h2",{},"AI cards"),
+field("Ship",sel([["All","All ships"]].concat(ships.map(function(n){return[n,n]})),AI.cs,function(v){AI.cs=v;render()})),
+h("div",{class:"dim"},rows.length+" loadout"+(rows.length===1?"":"s")+". Tap an upgrade to see its card. The number in brackets is its XP price.")
+]),
+h("div",{class:"grid g2"},rows.map(aiCardFor))
+]);
+}
+function viewAI(){
+AI.sub=AI.sub==="cards"?"cards":"roll";
+var bar=h("div",{class:"row",style:"margin-bottom:12px"},[
+btn("Random AI ship",function(){AI.sub="roll";render()},AI.sub==="roll"?"p":""),
+btn("AI cards",function(){AI.sub="cards";render()},AI.sub==="cards"?"p":"")
+]);
+return h("div",{},[bar,AI.sub==="cards"?viewAICards():viewAIRoll()]);
+}
 var DATA={v2manifest:null,v2ships:{},v1files:null,err:null,loading:false,ref:null};
 var BR={q:"",faction:"rebelalliance",ship:null,ownedOnly:false};
 function fetchJSON(u){return fetch(u).then(function(r){if(!r.ok)throw new Error(r.status+" "+u);return r.json()})}

@@ -280,3 +280,7 @@ Each pilot now tracks XP spent (`p.spent`) next to the XP balance (`p.xp`). The 
 ## 42. Paper size
 
 All print output is set to US Letter, 8.5 by 11 inches, with half inch margins, so the printable area is 7.5 by 10 inches. The pilot and mission sheets are limited to 7.5 inches wide on screen too, so the preview matches the page.
+
+## 43. AI cards tab
+
+AI Ships has two views: Random AI ship (the old roller) and AI cards. AI cards lists every loadout of the 28-row HotAC AI table as a card per ship, with a ship filter. Each card shows the Basic and Elite upgrades with initiative, and the named pilots. Upgrades found in the HotAC card data are tappable and show the full card with its XP price. These cards come from the AI table, not from the FGA Imperial AI card PDF, which stays in Rules and Books.
